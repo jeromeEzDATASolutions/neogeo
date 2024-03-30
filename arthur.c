@@ -18,6 +18,7 @@ typedef struct _arthur_t {
     u16 tmx[GNG_ARTHUR_TMX_HEIGHT][GNG_ARTHUR_TMX_WIDTH];
     u16 position_x;
     u16 sens; // 0 left or 1 right
+    u16 frames;
 } arthur_t;
 
 arthur_t arthur = {
@@ -32,6 +33,7 @@ arthur_t arthur = {
     .tmx = {},
     .position_x = 144,
     .sens = 1,
+    .frames = 0, 
 };
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -94,7 +96,8 @@ void arthur_walk_left(arthur_t *arthur){
     arthur->sens=0;
     arthur->tile_offset_y=2;
 
-    if ( frames % 4 == 0 || arthur->tile_offset_x == 0 ) {
+    if ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) {
+        arthur->frames = 0;
         arthur->tile_offset_x+=2;
         if ( arthur->tile_offset_x == 18 ){
             arthur->tile_offset_x=2;
@@ -108,7 +111,8 @@ void arthur_walk_right(arthur_t *arthur){
     arthur->sens=1;
     arthur->tile_offset_y=0;
 
-    if ( frames % 4 == 0 || arthur->tile_offset_x == 0 ) {
+    if ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) {
+        arthur->frames = 0;
         arthur->tile_offset_x+=2;
         if ( arthur->tile_offset_x == 18 ){
             arthur->tile_offset_x=2;

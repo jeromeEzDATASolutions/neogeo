@@ -80,8 +80,9 @@ int main(void) {
     for(;;) {
 
         frames++;
+
         if ( frames == 1000 ){
-            frames = 0;
+            frames=0;
         }
 
         if ( DEBUG ){
@@ -92,6 +93,8 @@ int main(void) {
         }
 
         if (bios_p1current & CNT_LEFT ) {
+
+            arthur.frames++;
 
             if ( background.position_x > 0 ){
 
@@ -109,6 +112,8 @@ int main(void) {
         }
         else if (bios_p1current & CNT_RIGHT && background.position_x < 3260 ) {
 
+            arthur.frames++;
+
             // Move background
             for ( u16 i=0;i<GAME_SPEED;i++){
                 move_planes_right();
@@ -117,11 +122,6 @@ int main(void) {
             // Moves Arthur on right
             arthur.position_x++;
             arthur_walk_right(&arthur);
-
-            if ( 1==2 ) {
-                setPaletteToBlack(palettes1, 2);
-                fadeOutPalette(palettes1, 2);
-            }
         }
         else {
             // Position neutre de Arthur
