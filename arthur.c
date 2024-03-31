@@ -22,7 +22,7 @@ typedef struct _arthur_t {
 } arthur_t;
 
 arthur_t arthur = {
-    .sprite = 33,
+    .sprite = CROM_TILE_START_ARTHUR,
     .tile_offset_x = 0, // Décalage si besoin de la première colonne pour Arthur
     .tile_offset_y = 0, // Arthur à gauche : ligne 2
     .palette = 4, 

@@ -29,6 +29,12 @@ extern u8 bios_p1current;
 /// Start of sprite tiles
 #define CROM_TILE_OFFSET 256
 
+// --- Define TILE_START foreach sprite group
+#define CROM_TILE_START_NUAGE 1 // 8
+#define CROM_TILE_START_BACKGROUND 9 // 32
+#define CROM_TILE_START_ARTHUR 41 // 2
+#define CROM_TILE_START_HERBE 43 // 32
+
 /// Start of gradient tiles in BIOS ROM
 #define SROM_GRADIENT_TILE_OFFSET 1280
 
@@ -47,6 +53,7 @@ u16 frames;
 #include "palette.c"
 #include "background.c"
 #include "arthur.c"
+#include "nuage.c"
 
 int main(void) {
 
@@ -67,6 +74,9 @@ int main(void) {
     setup_plane(&background);
     setup_plane(&herbe);
 
+    // --- Display nuage
+    nuage_setup(&nuage);
+
     // --- Calcul
     set_sprite_and_tile(&background);
     set_sprite_and_tile(&herbe);
@@ -86,7 +96,7 @@ int main(void) {
         }
 
         if ( DEBUG ){
-            //snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
+            snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
             //snprintf(str, 10, "SP %4d", background.position_sprite); ng_text(2, 5, 0, str);
             //snprintf(str, 10, "PA %x", MMAP_PALBANK1[17]); ng_text(2, 7, 0, str);
             //snprintf(str, 10, "f %4d", frames); ng_text(2, 7, 0, str);
@@ -100,6 +110,15 @@ int main(void) {
 
                 for ( u16 i=0;i<GAME_SPEED;i++){
                     move_planes_left();
+
+                    if ( background.position_x == 200 ){
+                        // Display nuage
+                        nuage.height=GNG_NUAGE_TMX_HEIGHT;
+                        nuage_setup(&nuage);
+                    }
+
+                    nuage.x++;
+                    nuage_update(&nuage);
                 }
 
                 // Moves Arthur on left
@@ -117,6 +136,7 @@ int main(void) {
             // Move background
             for ( u16 i=0;i<GAME_SPEED;i++){
                 move_planes_right();
+                nuage_move_right(&nuage);
             }
 
             // Moves Arthur on right
