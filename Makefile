@@ -93,15 +93,15 @@ sprites/arthur2.pal: sprites/arthur2.png
 	$(PALTOOL) $< -o $@
 
 # -------------------------------------
-# Nuages
+# Nuage
 # -------------------------------------
-sprites/nuages.png: gfx/tiles_nuages.png | sprites
+sprites/nuage.png: gfx/tiles_nuage.png | sprites
 	$(CONVERT) $^ $^ $^ +append -crop 224x48+0+0 +repage -background black -flatten $@
 
-sprites/nuages.c1 sprites/nuages.c2: sprites/nuages.png
+sprites/nuage.c1 sprites/nuage.c2: sprites/nuage.png
 	$(TILETOOL) --sprite -c $< -o $@ $(@:%.c1=%).c2
 
-sprites/nuages.pal: sprites/nuages.png
+sprites/nuage.pal: sprites/nuage.png
 	$(PALTOOL) $< -o $@
 
 
@@ -117,7 +117,7 @@ main.c: \
 	sprites/flotte.pal \
 	sprites/arthur1.pal \
 	sprites/arthur2.pal \
-	sprites/nuages.pal \
+	sprites/nuage.pal \
 
 # sound driver ROM: ngdevkit's nullsound
 MROMSIZE:=131072
@@ -136,7 +136,7 @@ $(CROM1): $(ASSETS)/rom/c1.bin \
 	sprites/flotte.c1 \
 	sprites/arthur1.c1 \
 	sprites/arthur2.c1 \
-	sprites/nuages.c1 \
+	sprites/nuage.c1 \
 	| rom
 	cat $(ASSETS)/rom/c1.bin $(filter %.c1,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 
@@ -146,7 +146,7 @@ $(CROM2): $(ASSETS)/rom/c2.bin \
 	sprites/flotte.c2 \
 	sprites/arthur1.c2 \
 	sprites/arthur2.c2 \
-	sprites/nuages.c2 \
+	sprites/nuage.c2 \
 	| rom
 	cat $(ASSETS)/rom/c2.bin $(filter %.c2,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 
