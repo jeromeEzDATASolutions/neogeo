@@ -22,7 +22,7 @@ typedef struct _plane_t {
 } plane_t;
 
 plane_t background = {
-    .sprite = 1,
+    .sprite = CROM_TILE_START_BACKGROUND,
     .palette = 1,
     .width = 32, // 32 * 16 = 512 pixels
     .height = 15,
@@ -37,7 +37,7 @@ plane_t background = {
 };
 
 plane_t herbe = {
-    .sprite = 37,
+    .sprite = CROM_TILE_START_HERBE,
     .palette = 2,
     .width = 32, // 32 * 16 = 512 pixels
     .height = 15,
