@@ -7,21 +7,28 @@
     "expandedProjectPaths": [
     ],
     "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
         "background.tsx": {
             "scaleInDock": 3,
             "scaleInEditor": 3.89
         },
         "gng.tmx": {
             "scale": 1.64,
-            "selectedLayer": 0,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 205.48780487804876,
-                "y": 97.86585365853658
+                "x": 101.21951219512194,
+                "y": 168.90243902439025
             }
         },
         "tiles_arthur1.tsx": {
             "scaleInDock": 1.5044,
             "scaleInEditor": 3.89
+        },
+        "tiles_arthur2.tsx": {
+            "scaleInDock": 2.3479,
+            "scaleInEditor": 2.74
         },
         "tiles_flottes.tsx": {
             "scaleInDock": 1,
@@ -31,11 +38,16 @@
             "scaleInDock": 4.1801,
             "scaleInEditor": 3.89
         },
+        "tiles_nuage.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 2.74
+        },
         "tiles_nuages.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 3.89
         }
     },
+    "last.externalTilesetPath": "/Users/ezdata/Documents/ngdevkit/05-scrolling",
     "last.imagePath": "/Users/ezdata/Documents/ngdevkit/05-scrolling/gfx",
     "map.height": 15,
     "map.lastUsedFormat": "tmx",
@@ -44,23 +56,21 @@
     "map.tileWidth": 16,
     "map.width": 224,
     "openFiles": [
+        "gng.tmx"
+    ],
+    "project": "gng.tiled-project",
+    "property.type": "int",
+    "recentFiles": [
         "gng.tmx",
+        "tiles_arthur2.tsx",
+        "tiles_nuage.tsx",
         "background.tsx",
         "tiles_herbe.tsx",
         "tiles_flottes.tsx",
         "tiles_arthur1.tsx",
         "tiles_nuages.tsx"
     ],
-    "project": "gng.tiled-project",
-    "property.type": "int",
-    "recentFiles": [
-        "tiles_nuages.tsx",
-        "tiles_arthur1.tsx",
-        "tiles_flottes.tsx",
-        "tiles_herbe.tsx",
-        "background.tsx",
-        "gng.tmx"
-    ],
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
         "height": 16,
