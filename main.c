@@ -35,6 +35,15 @@ extern u8 bios_p1current;
 #define CROM_TILE_START_ARTHUR 41 // 2
 #define CROM_TILE_START_HERBE 43 // 32
 
+// --- States for Arthur
+#define ARTHUR_SUR_LE_SOL 0
+#define ARTHUR_SUR_ECHELLE 1
+#define ARTHUR_SAUTE 2
+
+// --- Positions for Arthur
+#define ARTHUR_DEBOUT 0
+#define ARTHUR_CROUCHING 1
+
 /// Start of gradient tiles in BIOS ROM
 #define SROM_GRADIENT_TILE_OFFSET 1280
 
@@ -96,13 +105,16 @@ int main(void) {
         }
 
         if ( DEBUG ){
-            snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
-            //snprintf(str, 10, "SP %4d", background.position_sprite); ng_text(2, 5, 0, str);
-            //snprintf(str, 10, "PA %x", MMAP_PALBANK1[17]); ng_text(2, 7, 0, str);
-            //snprintf(str, 10, "f %4d", frames); ng_text(2, 7, 0, str);
+            //snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
+            snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
         }
 
-        if (bios_p1current & CNT_LEFT ) {
+        if (bios_p1current == 6 || bios_p1current == 2 || bios_p1current == 10 ){
+            // --- Arthur se baisse
+            arthur.position=ARTHUR_CROUCHING;
+            arthur_accroupi(&arthur);
+        }
+        else if (bios_p1current & CNT_LEFT ) {
 
             arthur.frames++;
 
@@ -110,22 +122,21 @@ int main(void) {
 
                 for ( u16 i=0;i<GAME_SPEED;i++){
                     move_planes_left();
-
+                    nuage_move_left(&nuage);
                     if ( background.position_x == 200 ){
                         // Display nuage
                         nuage.height=GNG_NUAGE_TMX_HEIGHT;
                         nuage_setup(&nuage);
                     }
-
-                    nuage.x++;
-                    nuage_update(&nuage);
                 }
 
                 // Moves Arthur on left
+                arthur.position=ARTHUR_DEBOUT;
                 arthur.position_x--;
                 arthur_walk_left(&arthur);
             }
             else {
+                // --- Arthur fait dur surplace
                 arthur_walk_left(&arthur);
             }
         }
@@ -133,18 +144,24 @@ int main(void) {
 
             arthur.frames++;
 
-            // Move background
+            // Move all
             for ( u16 i=0;i<GAME_SPEED;i++){
                 move_planes_right();
                 nuage_move_right(&nuage);
+                if ( background.position_x == 200 ){
+                    // Hide nuage
+                    nuage_hide(&nuage);
+                }
             }
 
             // Moves Arthur on right
+            arthur.position=ARTHUR_DEBOUT;
             arthur.position_x++;
             arthur_walk_right(&arthur);
         }
         else {
             // Position neutre de Arthur
+            arthur.position=ARTHUR_DEBOUT;
             arthur_stop_walk(&arthur);
         }
 

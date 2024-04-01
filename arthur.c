@@ -19,6 +19,8 @@ typedef struct _arthur_t {
     u16 position_x;
     u16 sens; // 0 left or 1 right
     u16 frames;
+    u16 state; // ARTHUR_SUR_LE_SOL - ARTHUR_SUR_ECHELLE - ARTHUR_SAUTE
+    u16 position; // ARTHUR_DEBOUT - ARTHUR_CROUCHING
 } arthur_t;
 
 arthur_t arthur = {
@@ -34,6 +36,7 @@ arthur_t arthur = {
     .position_x = 144,
     .sens = 1,
     .frames = 0, 
+    .state = 0,
 };
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -96,6 +99,10 @@ void arthur_walk_left(arthur_t *arthur){
     arthur->sens=0;
     arthur->tile_offset_y=2;
 
+    if ( arthur->tile_offset_x > 18 ){
+        arthur->tile_offset_x=0;
+    }
+
     if ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) {
         arthur->frames = 0;
         arthur->tile_offset_x+=2;
@@ -111,6 +118,10 @@ void arthur_walk_right(arthur_t *arthur){
     arthur->sens=1;
     arthur->tile_offset_y=0;
 
+    if ( arthur->tile_offset_x > 18 ){
+        arthur->tile_offset_x=0;
+    }
+
     if ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) {
         arthur->frames = 0;
         arthur->tile_offset_x+=2;
@@ -122,12 +133,27 @@ void arthur_walk_right(arthur_t *arthur){
 }
 
 void arthur_stop_walk(arthur_t *arthur){
+    arthur->tile_offset_x=0;
+    if ( arthur->sens == 1 )
+        arthur->tile_offset_y=0;
+    else arthur->tile_offset_y=2;
+    arthur_update(arthur);
+}
+
+void arthur_accroupi(arthur_t *arthur){
+
+    if ( bios_p1current == 6 ){
+        arthur->sens = 0;
+    }
+    else if ( bios_p1current == 10 ){
+        arthur->sens = 1;
+    }
+    
+    arthur->tile_offset_x=22;
     
     if ( arthur->sens == 1 )
         arthur->tile_offset_y=0;
     else arthur->tile_offset_y=2;
-
-    arthur->tile_offset_x=0;
     
     arthur_update(arthur);
 }

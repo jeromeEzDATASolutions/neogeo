@@ -16,6 +16,8 @@ typedef struct _plane_t {
     u16 increment;
     u16 tmx[15][224];
     u16 position_x;
+    u16 position_x_cpt1;
+    u16 position_x_cpt2;
     u16 position_sprite;
     u16 position_tile_right;
     u16 position_tile_left;
@@ -31,6 +33,8 @@ plane_t background = {
     .increment = FIX_POINT(0,1),  // 1.0
     .tmx = {},
     .position_x = 0,
+    .position_x_cpt1 = 0,
+    .position_x_cpt2 = 0,
     .position_sprite = 0,
     .position_tile_right = 0,
     .position_tile_left = 0,
@@ -46,6 +50,8 @@ plane_t herbe = {
     .increment = FIX_POINT(0,1),  // 1.0
     .tmx = {},
     .position_x = 0,
+    .position_x_cpt1 = 0,
+    .position_x_cpt2 = 0,
     .position_sprite = 0,
     .position_tile_right = 0,
     .position_tile_left = 0, 
@@ -161,7 +167,9 @@ void set_sprite_and_tile(plane_t *plane){
 void move_plane_right(plane_t *plane){
     plane->x-=plane->increment;
     plane->position_x+=plane->increment;
-    if ( plane->position_x%16 == 0 ){
+    plane->position_x_cpt1++;
+    if ( plane->position_x_cpt1 == 16 ){
+        plane->position_x_cpt1 = 0;
         set_sprite_and_tile(plane);
     }
 }
@@ -169,7 +177,9 @@ void move_plane_right(plane_t *plane){
 void move_plane_left(plane_t *plane){
     plane->x+=plane->increment;
     plane->position_x-=plane->increment;
-    if ( plane->position_x%16 == 0 ){
+    plane->position_x_cpt2++;
+    if ( plane->position_x_cpt2 == 16 ){
+        plane->position_x_cpt2 = 0;
         set_sprite_and_tile(plane);
     }
 }

@@ -80,14 +80,17 @@ void nuage_update(nuage_t *nuage){
     *REG_VRAMRW=(nuage->x<<7);
 }
 
-void nuage_move_right(nuage_t *nuage){
-    
-    /*if ( background.position_x == 200 ){
-        // Hide nuage
-        nuage->height=0;
-        nuage_setup(&nuage);
-    }*/
+void nuage_move_left(nuage_t *nuage){
+    nuage->x++;
+    nuage_update(nuage);
+}
 
+void nuage_move_right(nuage_t *nuage){
     nuage->x--;
     nuage_update(nuage);
+}
+
+void nuage_hide(nuage_t *nuage){
+    nuage->height=0;
+    nuage_setup(nuage);
 }
