@@ -15,11 +15,11 @@
             "scaleInEditor": 3.89
         },
         "gng.tmx": {
-            "scale": 1.64,
-            "selectedLayer": 4,
+            "scale": 2.2478,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 49.999999999999986,
-                "y": 110.36585365853657
+                "x": 223.107037992704,
+                "y": 180.62105169499068
             }
         },
         "tiles_arthur1.tsx": {
