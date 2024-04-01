@@ -57,12 +57,16 @@ extern u8 bios_p1current;
 #define GAME_SPEED 1
 
 u16 frames;
+int palettes_background_herbe[] = {1,2};
+int palette_nuage[] = {6};
+int palette_background_herbe_nuage[] = {1,2,6};
 
 // Plane and scrolling state
 #include "palette.c"
 #include "background.c"
 #include "arthur.c"
 #include "nuage.c"
+
 
 int main(void) {
 
@@ -71,9 +75,11 @@ int main(void) {
     ng_cls();
     init_palette();
 
+    // --- Set palette 6 to black
+    setPaletteToBlack(palette_nuage, 1);
+
     // --- Set palette 1 and 2 to black
-    int palettes1[] = {1,2};
-    setPaletteToBlack(palettes1, 2);
+    setPaletteToBlack(palettes_background_herbe, 2);
 
     // --- Load tmx from background
     init_plane_tmx_background(&background);
@@ -93,8 +99,11 @@ int main(void) {
     // --- Display sprite Arthur
     arthur_setup(&arthur);
 
+    // --- Display nuages
+    fadeOutPalette(palette_nuage, 1);
+
     // --- Display background
-    fadeOutPalette(palettes1, 2);
+    fadeOutPalette(palettes_background_herbe, 2);
 
     for(;;) {
 
@@ -106,7 +115,7 @@ int main(void) {
 
         if ( DEBUG ){
             //snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
-            snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
+            //snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
         }
 
         if (bios_p1current == 6 || bios_p1current == 2 || bios_p1current == 10 ){
@@ -144,7 +153,7 @@ int main(void) {
 
             arthur.frames++;
 
-            // Move all
+            // Move background & nuage
             for ( u16 i=0;i<GAME_SPEED;i++){
                 move_planes_right();
                 nuage_move_right(&nuage);
@@ -170,6 +179,8 @@ int main(void) {
 
         // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
         // fadeInPalette(palettes1, 2);
+
+        snprintf(str, 10, "Tile %3d", background.tmx[13][arthur.tile]); ng_text(2, 3, 0, str);
 
         ng_wait_vblank();
     }

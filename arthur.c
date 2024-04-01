@@ -21,6 +21,7 @@ typedef struct _arthur_t {
     u16 frames;
     u16 state; // ARTHUR_SUR_LE_SOL - ARTHUR_SUR_ECHELLE - ARTHUR_SAUTE
     u16 position; // ARTHUR_DEBOUT - ARTHUR_CROUCHING
+    u16 tile;
 } arthur_t;
 
 arthur_t arthur = {
@@ -37,6 +38,7 @@ arthur_t arthur = {
     .sens = 1,
     .frames = 0, 
     .state = 0,
+    .tile = 0, 
 };
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -111,10 +113,23 @@ void arthur_walk_left(arthur_t *arthur){
         }
         arthur_update(arthur);
     }
+
+    // --- On determine la tile sur laquelle est Arthur
+    arthur->tile = (arthur->position_x>>4)+1;
+
+    // Arthur ne peut marcher que sur le sol : tile 401
+    if ( background.tmx[13][arthur->tile] == 0 ){
+        
+        // Arthur meurt - on le fait tomber
+
+        // Ensuite on fait un fondu pour tout faire disparaitre
+        fadeInPalette(palette_background_herbe_nuage, 3);
+    }
 }
 
 void arthur_walk_right(arthur_t *arthur){
 
+    char str[10];
     arthur->sens=1;
     arthur->tile_offset_y=0;
 
@@ -129,6 +144,18 @@ void arthur_walk_right(arthur_t *arthur){
             arthur->tile_offset_x=2;
         }
         arthur_update(arthur);
+    }
+
+    // --- On determine la tile sur laquelle est Arthur
+    arthur->tile = (arthur->position_x>>4)+1;
+
+    // Arthur ne peut marcher que sur le sol : tile 401
+    if ( background.tmx[13][arthur->tile] == 0 ){
+        
+        // Arthur meurt - on le fait tomber
+
+        // Ensuite on fait un fondu pour tout faire disparaitre
+        fadeInPalette(palette_background_herbe_nuage, 3);
     }
 }
 
