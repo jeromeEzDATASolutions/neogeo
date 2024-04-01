@@ -46,6 +46,77 @@ void setPaletteToBlack(int palettes[], int nb_elem) {
     }
 }
 
+// -----------------------------
+// --- Palette to black
+// -----------------------------
+void fadeInPalette(int palettes[], int nb_elem) {
+
+    u8 end = 0;
+    u16 palette = 0;
+    u16 colors_ok[nb_elem][16];
+    u16 caching[16];
+
+    // --- Init color OK
+    for (u16 p=0; p<nb_elem; p++) {
+        for (u16 i=0; i<16; i++) {
+            colors_ok[p][i] = 0;
+        }
+    }
+
+    // --- Caching all colors from MMAP_PALBANK1
+    u16 colors_palbank[nb_elem][16][3];
+    for (u16 p=0; p<nb_elem; p++) {
+        for (u16 c=16*palettes[p], l=0; l<16; c++, l++) {
+            colors_palbank[p][l][0] = (MMAP_PALBANK1[c] >> 8) & 0xF;
+            colors_palbank[p][l][1] = (MMAP_PALBANK1[c] >> 4) & 0xF;
+            colors_palbank[p][l][2] = MMAP_PALBANK1[c] & 0xF;
+        }
+    }
+
+    while ( end == 0 ) {
+
+        for (u16 p=0; p<nb_elem; p++) {
+
+            for (u16 c=16*palettes[p], l=0; l < 16; c++, l++) {
+
+                if ( colors_palbank[p][l][0] > 0 ) {
+                    colors_palbank[p][l][0]--;
+                }
+
+                if ( colors_palbank[p][l][1] > 0 ) {
+                    colors_palbank[p][l][1]--;
+                }
+
+                if ( colors_palbank[p][l][2] > 0 ) {
+                    colors_palbank[p][l][2]--;
+                }
+
+                caching[l] = (colors_palbank[p][l][0] << 8) | (colors_palbank[p][l][1] << 4) | colors_palbank[p][l][2];
+
+                if ( colors_palbank[p][l][0] == 0 && colors_palbank[p][l][1] == 0 && colors_palbank[p][l][2] == 0 ){
+                    colors_ok[p][l] = 1;
+                }
+            }
+
+            ng_wait_vblank();
+
+            for (u16 c=16*palettes[p], l=0; l < 16; c++, l++) {
+                MMAP_PALBANK1[c] = caching[l];
+            }
+        }
+
+        // --- On checke que tout le tab est rempli afin d'arreter le fondu
+        end = 1;
+        for (u16 p=0; p<nb_elem; p++) {
+            for (u16 i=0; i<16; i++) {
+                if ( colors_ok[p][i] == 0 ) {
+                    end=0;
+                }
+            }
+        }
+    }
+}
+
 void fadeOutPalette(int palettes[], int nb_elem) {
 
     char str[20];
