@@ -159,11 +159,17 @@ int main(void) {
             arthur.position_x++;
             arthur_walk_right(&arthur);
         }
+        else if ( bios_p1current & CNT_UP ){
+            
+        }
         else {
             // Position neutre de Arthur
             arthur.position=ARTHUR_DEBOUT;
             arthur_stop_walk(&arthur);
         }
+
+        // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
+        // fadeInPalette(palettes1, 2);
 
         ng_wait_vblank();
     }
