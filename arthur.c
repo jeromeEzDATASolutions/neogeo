@@ -20,6 +20,7 @@ static void arthur_init_tmx();
 static int arthur_walk_right();
 static void arthur_stop_walk();
 static void arthur_jump_vertical();
+static void arthur_jump_horizontal();
 static void arthur_jump_update();
 static void arthur_check_si_dans_le_vide();
 
@@ -123,7 +124,7 @@ void arthur_update(arthur_t *arthur){
     *REG_VRAMRW=(arthur->x<<7);
 }
 
-void arthur_walk_left(arthur_t *arthur){
+int arthur_walk_left(arthur_t *arthur){
 
     arthur->sens=0;
     arthur->tile_offset_y=2;
@@ -154,11 +155,20 @@ void arthur_walk_left(arthur_t *arthur){
         // Ensuite on fait un fondu pour tout faire disparaitre
         // fadeInPalette(palette_background_herbe_nuage, 3);
     //}
+
+    return 1;
 }
 
 void arthur_jump_vertical(arthur_t *arthur){
-    if ( arthur->state != ARTHUR_SAUTE_VERTICALEMENT ){
+    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
         arthur->state = ARTHUR_SAUTE_VERTICALEMENT;
+        arthur->velocity = 35; // 35
+    }
+}
+
+void arthur_jump_horizontal(arthur_t *arthur){
+    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+        arthur->state = ARTHUR_SAUTE_HORIZONTALEMENT;
         arthur->velocity = 35; // 35
     }
 }
@@ -173,7 +183,14 @@ void arthur_jump_update(arthur_t *arthur){
         else arthur->tile_offset_y=2;
     }
 
-    if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE_VERTICALEMENT) {
+    if ( arthur->state == ARTHUR_SAUTE_HORIZONTALEMENT ){
+        arthur->tile_offset_x=20;
+        if ( arthur->sens == 1 )
+            arthur->tile_offset_y=0;
+        else arthur->tile_offset_y=2;
+    }
+
+    if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE_VERTICALEMENT || arthur->state == ARTHUR_SAUTE_HORIZONTALEMENT) {
         arthur->velocity-=2;
         arthur->yf+=arthur->velocity;
         arthur->y = arthur->yf/8;
@@ -201,7 +218,7 @@ int arthur_walk_right(arthur_t *arthur){
         arthur->tile_offset_x=0;
     }
 
-    if ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) {
+    if ( arthur->state == ARTHUR_SUR_LE_SOL && ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) ) {
         arthur->frames = 0;
         arthur->tile_offset_x+=2;
         if ( arthur->tile_offset_x == 18 ){
