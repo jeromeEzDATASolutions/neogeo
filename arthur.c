@@ -36,15 +36,17 @@ typedef struct _arthur_t {
     u16 tmx[GNG_ARTHUR_TMX_HEIGHT][GNG_ARTHUR_TMX_WIDTH];
     u16 position_x;
     u16 position_y;
-    u16 sens; // 0 left or 1 right
+    u16 sens;               // 0 left or 1 right
     u16 frames;
-    u16 state; // ARTHUR_SUR_LE_SOL - ARTHUR_SUR_ECHELLE - ARTHUR_SAUTE
-    u16 position; // ARTHUR_DEBOUT - ARTHUR_CROUCHING
+    u16 state;              // ARTHUR_SUR_LE_SOL - ARTHUR_SUR_ECHELLE - ARTHUR_SAUTE
+    u16 position;           // ARTHUR_DEBOUT - ARTHUR_CROUCHING
     u16 tilex;
     u16 tiley;
     int velocity;
     u16 tile_bottom;
     s16 yf;
+    u8 saut_up;             // Phase montante du saut d'Arthur
+    u8 saut_down;           // Phase descendante du saut d'Arthur
 } arthur_t;
 
 arthur_t arthur = {
@@ -67,6 +69,8 @@ arthur_t arthur = {
     .velocity = 0,
     .tile_bottom = 0,
     .yf = 31*8,
+    .saut_up = 0,
+    .saut_down = 0, 
 };
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -268,6 +272,15 @@ void arthur_jump_update(arthur_t *arthur){
     }
 
     if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE_VERTICALEMENT || arthur->state == ARTHUR_SAUTE_HORIZONTALEMENT) {
+
+        if ( arthur->yf < arthur->yf + arthur->velocity ){
+            arthur->saut_up = 1;
+            arthur->saut_down = 0;
+        }
+        else {
+            arthur->saut_up = 0;
+            arthur->saut_down = 1;
+        }
         
         arthur->velocity-=2;
         arthur->yf+=arthur->velocity;
@@ -283,9 +296,11 @@ void arthur_jump_update(arthur_t *arthur){
     }
 
     // --- arthur->y == 31 
-    if ( arthur->tile_bottom == 267 ){
+    if ( arthur->saut_down && arthur->tile_bottom == 267 ){
         arthur->velocity = 32;
         arthur->state=ARTHUR_SUR_LE_SOL;
+        arthur->saut_up = 0;
+        arthur->saut_down = 0;
     }
 
     //arthur->tilex = (arthur->position_x>>4)+1;

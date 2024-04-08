@@ -203,8 +203,6 @@ int main(void) {
         // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
         // fadeInPalette(palettes1, 2);
 
-        snprintf(str, 30, "PosY %3d", arthur.velocity); ng_text(2, 3, 0, str);
-
         if ( arthur.state == ARTHUR_SAUTE_VERTICALEMENT || arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ) {
             arthur_jump_update(&arthur);
             if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
@@ -221,6 +219,9 @@ int main(void) {
             }
             // arthur_walk_right(&arthur);
         }
+
+        snprintf(str, 30, "UP %3d", arthur.saut_up); ng_text(2, 3, 0, str);
+        snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
 
         ng_wait_vblank();
     }
