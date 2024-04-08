@@ -1,9 +1,4 @@
 {
-    "Map/SizeTest": {
-        "height": 4300,
-        "width": 2
-    },
-    "activeFile": "gng.tmx",
     "expandedProjectPaths": [
     ],
     "fileStates": {
@@ -16,10 +11,10 @@
         },
         "gng.tmx": {
             "scale": 1.883,
-            "selectedLayer": 0,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 267.9235262878385,
-                "y": 98.77854487519917
+                "x": 136.21879978757303,
+                "y": 99.30961232076473
             }
         },
         "tiles_arthur1.tsx": {
@@ -47,19 +42,9 @@
             "scaleInEditor": 3.89
         }
     },
-    "last.externalTilesetPath": "/Users/ezdata/Documents/ngdevkit/05-scrolling",
-    "last.imagePath": "/Users/ezdata/Documents/ngdevkit/05-scrolling/gfx",
-    "map.height": 15,
-    "map.lastUsedFormat": "tmx",
-    "map.renderOrder": "3",
-    "map.tileHeight": 16,
-    "map.tileWidth": 16,
-    "map.width": 224,
     "openFiles": [
         "gng.tmx"
     ],
-    "project": "gng.tiled-project",
-    "property.type": "int",
     "recentFiles": [
         "gng.tmx",
         "tiles_arthur2.tsx",
@@ -69,11 +54,5 @@
         "tiles_flottes.tsx",
         "tiles_arthur1.tsx",
         "tiles_nuages.tsx"
-    ],
-    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
-    "tileset.lastUsedFormat": "tsx",
-    "tileset.tileSize": {
-        "height": 16,
-        "width": 16
-    }
+    ]
 }

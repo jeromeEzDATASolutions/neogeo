@@ -157,33 +157,27 @@ void arthur_walk_left(arthur_t *arthur){
 }
 
 void arthur_jump_vertical(arthur_t *arthur){
-
     if ( arthur->state != ARTHUR_SAUTE_VERTICALEMENT ){
         arthur->state = ARTHUR_SAUTE_VERTICALEMENT;
-        arthur->velocity = 35;
+        arthur->velocity = 35; // 35
     }
-
-    arthur->tile_offset_x=18;
-    if ( arthur->sens == 1 )
-        arthur->tile_offset_y=0;
-    else arthur->tile_offset_y=2;
-
-    /*
-    arthur_stop_walk(arthur);
-    arthur->state = ARTHUR_SAUTE;
-    arthur->y+=1;
-    arthur->position_y+=1;
-    */
-
-    //arthur_update(arthur);
 }
 
 void arthur_jump_update(arthur_t *arthur){
+
+    // --- On affiche la tile pour le saut vertical
+    if ( arthur->state == ARTHUR_SAUTE_VERTICALEMENT ){
+        arthur->tile_offset_x=8;
+        if ( arthur->sens == 1 )
+            arthur->tile_offset_y=0;
+        else arthur->tile_offset_y=2;
+    }
 
     if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE_VERTICALEMENT) {
         arthur->velocity-=2;
         arthur->yf+=arthur->velocity;
         arthur->y = arthur->yf/8;
+        arthur->position_y = arthur->yf/8;
         arthur_update(arthur);
     }
 
