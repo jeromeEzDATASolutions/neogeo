@@ -222,6 +222,9 @@ int main(void) {
 
         snprintf(str, 30, "UP %3d", arthur.saut_up); ng_text(2, 3, 0, str);
         snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
+        snprintf(str, 30, "POSY %3d", arthur.position_y); ng_text(2, 7, 0, str);
+        snprintf(str, 30, "TILE B %3d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 9, 0, str);
+        snprintf(str, 30, "TILEY %3d", arthur.tiley); ng_text(2, 11, 0, str);
 
         ng_wait_vblank();
     }

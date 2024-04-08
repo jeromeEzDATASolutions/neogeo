@@ -271,7 +271,7 @@ void arthur_jump_update(arthur_t *arthur){
         else arthur->tile_offset_y=2;
     }
 
-    if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE_VERTICALEMENT || arthur->state == ARTHUR_SAUTE_HORIZONTALEMENT) {
+    if ( arthur->state == ARTHUR_SAUTE_VERTICALEMENT || arthur->state == ARTHUR_SAUTE_HORIZONTALEMENT) {
 
         if ( arthur->yf < arthur->yf + arthur->velocity ){
             arthur->saut_up = 1;
@@ -281,7 +281,7 @@ void arthur_jump_update(arthur_t *arthur){
             arthur->saut_up = 0;
             arthur->saut_down = 1;
         }
-        
+
         arthur->velocity-=2;
         arthur->yf+=arthur->velocity;
         arthur->y = arthur->yf/8;
@@ -289,21 +289,17 @@ void arthur_jump_update(arthur_t *arthur){
 
         // --- On determine la tile sur laquelle est Arthur
         arthur->tilex = (arthur->position_x>>4)+1;
-        arthur->tiley = 15-((arthur->position_y>>4)+2);
+        arthur->tiley = 15-(((arthur->position_y+1)>>4)+2);
         arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
 
-        arthur_update(arthur);
+        // --- arthur->y == 31 
+        if ( arthur->saut_down && arthur->tile_bottom == 267 ){
+            arthur->state = ARTHUR_SUR_LE_SOL;
+            arthur->saut_up = 0;
+            arthur->saut_down = 0;
+        }
+        else {
+            arthur_update(arthur);
+        }
     }
-
-    // --- arthur->y == 31 
-    if ( arthur->saut_down && arthur->tile_bottom == 267 ){
-        arthur->velocity = 32;
-        arthur->state=ARTHUR_SUR_LE_SOL;
-        arthur->saut_up = 0;
-        arthur->saut_down = 0;
-    }
-
-    //arthur->tilex = (arthur->position_x>>4)+1;
-    //arthur->tiley = 15-((arthur->position_y>>4)+2);
-    //arthur->tile_bottom = background.tmx[arthur->tiley+1][arthur->tilex];
 }
