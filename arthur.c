@@ -55,10 +55,10 @@ arthur_t arthur = {
     .width = 2, // 32 * 16 = 512 pixels
     .height = 2,
     .x = 144,
-    .y = 131,
+    .y = 31,
     .tmx = {},
     .position_x = 144,
-    .position_y = 131,
+    .position_y = 31,
     .sens = 1,
     .frames = 0, 
     .state = ARTHUR_SUR_LE_SOL,
@@ -66,7 +66,7 @@ arthur_t arthur = {
     .tiley = 0, 
     .velocity = 0,
     .tile_bottom = 0,
-    .yf = 131*8,
+    .yf = 31*8,
 };
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -159,20 +159,6 @@ int arthur_walk_left(arthur_t *arthur){
     return 1;
 }
 
-void arthur_jump_vertical(arthur_t *arthur){
-    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-        arthur->state = ARTHUR_SAUTE_VERTICALEMENT;
-        arthur->velocity = 35; // 35
-    }
-}
-
-void arthur_jump_horizontal(arthur_t *arthur){
-    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-        arthur->state = ARTHUR_SAUTE_HORIZONTALEMENT;
-        arthur->velocity = 35; // 35
-    }
-}
-
 int arthur_walk_right(arthur_t *arthur){
 
     char str[10];
@@ -250,6 +236,20 @@ void arthur_check_si_dans_le_vide(arthur_t *arthur){
     //snprintf(str1, 30, "tilex %3d", arthur->tile_bottom); ng_text(2, 3, 0, str1);
 }
 
+void arthur_jump_vertical(arthur_t *arthur){
+    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+        arthur->state = ARTHUR_SAUTE_VERTICALEMENT;
+        arthur->velocity = 35; // 35
+    }
+}
+
+void arthur_jump_horizontal(arthur_t *arthur){
+    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+        arthur->state = ARTHUR_SAUTE_HORIZONTALEMENT;
+        arthur->velocity = 35; // 35
+    }
+}
+
 void arthur_jump_update(arthur_t *arthur){
 
     // --- On affiche la tile pour le saut vertical
@@ -272,17 +272,18 @@ void arthur_jump_update(arthur_t *arthur){
         arthur->velocity-=2;
         arthur->yf+=arthur->velocity;
         arthur->y = arthur->yf/8;
-        arthur->position_y = arthur->yf/8;
+        arthur->position_y = arthur->y;
 
         // --- On determine la tile sur laquelle est Arthur
         arthur->tilex = (arthur->position_x>>4)+1;
         arthur->tiley = 15-((arthur->position_y>>4)+2);
-        arthur->tile_bottom = background.tmx[arthur->tiley+1][arthur->tilex];
+        arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
 
         arthur_update(arthur);
     }
 
-    if ( arthur->y == 31 ){
+    // --- arthur->y == 31 
+    if ( arthur->tile_bottom == 267 ){
         arthur->velocity = 32;
         arthur->state=ARTHUR_SUR_LE_SOL;
     }
