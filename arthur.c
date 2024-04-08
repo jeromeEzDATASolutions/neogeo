@@ -55,10 +55,10 @@ arthur_t arthur = {
     .width = 2, // 32 * 16 = 512 pixels
     .height = 2,
     .x = 144,
-    .y = 31,
+    .y = 131,
     .tmx = {},
     .position_x = 144,
-    .position_y = 31,
+    .position_y = 131,
     .sens = 1,
     .frames = 0, 
     .state = ARTHUR_SUR_LE_SOL,
@@ -66,7 +66,7 @@ arthur_t arthur = {
     .tiley = 0, 
     .velocity = 0,
     .tile_bottom = 0,
-    .yf = 31*8,
+    .yf = 131*8,
 };
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -173,41 +173,6 @@ void arthur_jump_horizontal(arthur_t *arthur){
     }
 }
 
-void arthur_jump_update(arthur_t *arthur){
-
-    // --- On affiche la tile pour le saut vertical
-    if ( arthur->state == ARTHUR_SAUTE_VERTICALEMENT ){
-        arthur->tile_offset_x=18;
-        if ( arthur->sens == 1 )
-            arthur->tile_offset_y=0;
-        else arthur->tile_offset_y=2;
-    }
-
-    if ( arthur->state == ARTHUR_SAUTE_HORIZONTALEMENT ){
-        arthur->tile_offset_x=20;
-        if ( arthur->sens == 1 )
-            arthur->tile_offset_y=0;
-        else arthur->tile_offset_y=2;
-    }
-
-    if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE_VERTICALEMENT || arthur->state == ARTHUR_SAUTE_HORIZONTALEMENT) {
-        arthur->velocity-=2;
-        arthur->yf+=arthur->velocity;
-        arthur->y = arthur->yf/8;
-        arthur->position_y = arthur->yf/8;
-        arthur_update(arthur);
-    }
-
-    if ( arthur->y == 31 ){
-        arthur->velocity = 32;
-        arthur->state=ARTHUR_SUR_LE_SOL;
-    }
-
-    //arthur->tilex = (arthur->position_x>>4)+1;
-    //arthur->tiley = 15-((arthur->position_y>>4)+2);
-    //arthur->tile_bottom = background.tmx[arthur->tiley+1][arthur->tilex];
-}
-
 int arthur_walk_right(arthur_t *arthur){
 
     char str[10];
@@ -283,4 +248,46 @@ void arthur_check_si_dans_le_vide(arthur_t *arthur){
     char str1[10];
     //u16 nombre = FIX_POINT(10,50);
     //snprintf(str1, 30, "tilex %3d", arthur->tile_bottom); ng_text(2, 3, 0, str1);
+}
+
+void arthur_jump_update(arthur_t *arthur){
+
+    // --- On affiche la tile pour le saut vertical
+    if ( arthur->state == ARTHUR_SAUTE_VERTICALEMENT ){
+        arthur->tile_offset_x=18;
+        if ( arthur->sens == 1 )
+            arthur->tile_offset_y=0;
+        else arthur->tile_offset_y=2;
+    }
+
+    if ( arthur->state == ARTHUR_SAUTE_HORIZONTALEMENT ){
+        arthur->tile_offset_x=20;
+        if ( arthur->sens == 1 )
+            arthur->tile_offset_y=0;
+        else arthur->tile_offset_y=2;
+    }
+
+    if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE_VERTICALEMENT || arthur->state == ARTHUR_SAUTE_HORIZONTALEMENT) {
+        
+        arthur->velocity-=2;
+        arthur->yf+=arthur->velocity;
+        arthur->y = arthur->yf/8;
+        arthur->position_y = arthur->yf/8;
+
+        // --- On determine la tile sur laquelle est Arthur
+        arthur->tilex = (arthur->position_x>>4)+1;
+        arthur->tiley = 15-((arthur->position_y>>4)+2);
+        arthur->tile_bottom = background.tmx[arthur->tiley+1][arthur->tilex];
+
+        arthur_update(arthur);
+    }
+
+    if ( arthur->y == 31 ){
+        arthur->velocity = 32;
+        arthur->state=ARTHUR_SUR_LE_SOL;
+    }
+
+    //arthur->tilex = (arthur->position_x>>4)+1;
+    //arthur->tiley = 15-((arthur->position_y>>4)+2);
+    //arthur->tile_bottom = background.tmx[arthur->tiley+1][arthur->tilex];
 }
