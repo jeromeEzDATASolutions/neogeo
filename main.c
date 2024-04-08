@@ -40,6 +40,7 @@ extern u8 bios_p1current;
 #define ARTHUR_SUR_ECHELLE 1
 #define ARTHUR_SAUTE_VERTICALEMENT 2
 #define ARTHUR_SAUTE_HORIZONTALEMENT 3
+#define ARTHUR_TOMBE 4
 
 // --- Positions for Arthur
 #define ARTHUR_DEBOUT 0
@@ -230,12 +231,15 @@ int main(void) {
             }
             // arthur_walk_right(&arthur);
         }
+        else if ( arthur.state == ARTHUR_TOMBE ) {
+            arthur_tombe_update(&arthur);
+        }
 
-        snprintf(str, 30, "UP %3d", arthur.saut_up); ng_text(2, 3, 0, str);
-        snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
-        snprintf(str, 30, "POSY %3d", arthur.position_y); ng_text(2, 7, 0, str);
-        snprintf(str, 30, "TILE B %3d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 9, 0, str);
-        snprintf(str, 30, "posy %5d", arthur.tiley); ng_text(2, 11, 0, str);
+        //snprintf(str, 30, "UP %3d", arthur.saut_up); ng_text(2, 3, 0, str);
+        //snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
+        //snprintf(str, 30, "POSY %3d", arthur.position_y); ng_text(2, 7, 0, str);
+        //snprintf(str, 30, "TILE B %3d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 9, 0, str);
+        snprintf(str, 30, "posY %5d", arthur.position_y); ng_text(2, 3, 0, str);
 
         ng_wait_vblank();
     }

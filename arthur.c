@@ -24,6 +24,7 @@ static void arthur_jump_horizontal();
 static void arthur_jump_update();
 static void arthur_check_si_dans_le_vide();
 static void arthur_calcule_tiles();
+static void arthur_tombe();
 
 typedef struct _arthur_t {
     u16 sprite;
@@ -45,6 +46,7 @@ typedef struct _arthur_t {
     u16 tiley;
     int velocity;
     u16 tile_bottom;
+    u16 tile_right;
     s16 yf;
     u8 saut_up;             // Phase montante du saut d'Arthur
     u8 saut_down;           // Phase descendante du saut d'Arthur
@@ -69,6 +71,7 @@ arthur_t arthur = {
     .tiley = 0, 
     .velocity = 0,
     .tile_bottom = 0,
+    .tile_right = 0,
     .yf = 32*8,
     .saut_up = 0,
     .saut_down = 0, 
@@ -185,8 +188,7 @@ int arthur_walk_right(arthur_t *arthur){
     arthur_calcule_tiles(arthur);
 
     // Arthur ne peut marcher que sur le sol : tile 401
-    u16 tile_on_right = arthur->tilex+1;
-    if ( background.tmx[arthur->tiley][tile_on_right] == 0 || 1 ){
+    if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 ){
         
         // Arthur peut marcher à droite
         arthur->position=ARTHUR_DEBOUT;
@@ -200,6 +202,9 @@ int arthur_walk_right(arthur_t *arthur){
         // Ensuite on fait un fondu pour tout faire disparaitre
         // fadeInPalette(palette_background_herbe_nuage, 3);
         return 1;
+    }
+    else {
+        arthur_tombe(arthur);
     }
 
     return 0;
@@ -289,7 +294,7 @@ void arthur_jump_update(arthur_t *arthur){
 
         // --- arthur->y == 31 
         //if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 ) ){
-        if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 ) ){
+        if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 80 ) ){
             arthur->velocity = 35; // 35
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->saut_up = 0;
@@ -309,4 +314,20 @@ void arthur_calcule_tiles(arthur_t *arthur){
     arthur->tilex = (arthur->position_x>>4)+1;
     arthur->tiley = 15-((arthur->position_y>>4)+1);
     arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
+    arthur->tile_right = tmx_sol[arthur->tiley][arthur->tilex+1];
+}
+
+void arthur_tombe(arthur_t *arthur){
+    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+        arthur->state = ARTHUR_TOMBE;
+        arthur->velocity = 35;
+    }
+}
+
+void arthur_tombe_update(arthur_t *arthur){
+    if ( arthur->position_y > 0 ){
+        arthur->y-=10;
+        arthur->position_y-=10;
+        arthur_update(arthur);
+    }
 }
