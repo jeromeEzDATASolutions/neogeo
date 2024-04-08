@@ -288,19 +288,25 @@ void arthur_jump_update(arthur_t *arthur){
         arthur_calcule_tiles(arthur);
 
         // --- arthur->y == 31 
-        if ( arthur->saut_down && arthur->tile_bottom == 267 ){
+        //if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 ) ){
+        if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 ) ){
+            arthur->velocity = 35; // 35
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->saut_up = 0;
             arthur->saut_down = 0;
+            arthur->y = (15-(arthur->tiley+1))*16;
+            arthur->position_y = (15-(arthur->tiley+1))*16;
+            arthur->yf = arthur->y*8;
         }
-        else {
-            arthur_update(arthur);
-        }
+
+        arthur_update(arthur);
+
+        //for ( u16 i=0; i<3000; i++){}
     }
 }
 
 void arthur_calcule_tiles(arthur_t *arthur){
     arthur->tilex = (arthur->position_x>>4)+1;
-    arthur->tiley = 15-(((arthur->position_y)>>4)+1);
+    arthur->tiley = 15-((arthur->position_y>>4)+1);
     arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
 }

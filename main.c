@@ -86,11 +86,11 @@ int main(void) {
 
     // --- Load tmx from background
     init_plane_tmx_background(&background);
-    init_plane_tmx_herbe(&herbe);
+    //init_plane_tmx_herbe(&herbe);
     
     // --- Display background (terre & herbe)
     setup_plane(&background);
-    setup_plane(&herbe);
+    //setup_plane(&herbe);
 
     // --- Display nuage
     nuage_setup(&nuage);
@@ -129,10 +129,10 @@ int main(void) {
         }
 
         if (bios_p1current == 2 && arthur.y > 0){
-            arthur.y--;
+            /*arthur.y--;
             arthur.position_y--;
             arthur_update(&arthur);
-            arthur_calcule_tiles(&arthur);
+            arthur_calcule_tiles(&arthur);*/
         }
         else if (bios_p1current == 6999 || bios_p1current == 2999 || bios_p1current == 10999 ){
             // --- Arthur se baisse
@@ -190,10 +190,10 @@ int main(void) {
         }
         else if ( bios_p1current & CNT_UP ){
 
-            arthur.y++;
+            /*arthur.y++;
             arthur.position_y++;
             arthur_update(&arthur);
-            arthur_calcule_tiles(&arthur);
+            arthur_calcule_tiles(&arthur);*/
             
         }
         else {
@@ -235,7 +235,7 @@ int main(void) {
         snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
         snprintf(str, 30, "POSY %3d", arthur.position_y); ng_text(2, 7, 0, str);
         snprintf(str, 30, "TILE B %3d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 9, 0, str);
-        snprintf(str, 30, "TILEY %3d", arthur.tiley); ng_text(2, 11, 0, str);
+        snprintf(str, 30, "posy %5d", arthur.tiley); ng_text(2, 11, 0, str);
 
         ng_wait_vblank();
     }
