@@ -19,7 +19,7 @@
 static void arthur_init_tmx();
 static int arthur_walk_right();
 static void arthur_stop_walk();
-static void arthur_jump();
+static void arthur_jump_vertical();
 static void arthur_jump_update();
 static void arthur_check_si_dans_le_vide();
 
@@ -156,28 +156,17 @@ void arthur_walk_left(arthur_t *arthur){
     //}
 }
 
-void jump(arthur_t *arthur) {
-    arthur->velocity = JUMP_VELOCITY;
-}
+void arthur_jump_vertical(arthur_t *arthur){
 
-void update(arthur_t *arthur) {
-    //if ( frames%16 == 0 ){
-        arthur->y = ADD_FIXED(arthur->y, arthur->velocity);
-        arthur->velocity = ADD_FIXED(arthur->velocity, GRAVITY);
-        if (FIXED_TO_INT(arthur->y) <= 0) {
-            arthur->y = INT_TO_FIXED(0);
-            arthur->velocity = INT_TO_FIXED(0);
-        }
-        arthur_update(arthur);
-    //}
-}
-
-void arthur_jump(arthur_t *arthur){
-
-    if ( arthur->state != ARTHUR_SAUTE ){
-        arthur->state = ARTHUR_SAUTE;
+    if ( arthur->state != ARTHUR_SAUTE_VERTICALEMENT ){
+        arthur->state = ARTHUR_SAUTE_VERTICALEMENT;
         arthur->velocity = 35;
     }
+
+    arthur->tile_offset_x=18;
+    if ( arthur->sens == 1 )
+        arthur->tile_offset_y=0;
+    else arthur->tile_offset_y=2;
 
     /*
     arthur_stop_walk(arthur);
@@ -191,7 +180,7 @@ void arthur_jump(arthur_t *arthur){
 
 void arthur_jump_update(arthur_t *arthur){
 
-    if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE) {
+    if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE_VERTICALEMENT) {
         arthur->velocity-=2;
         arthur->yf+=arthur->velocity;
         arthur->y = arthur->yf/8;
@@ -281,6 +270,6 @@ void arthur_accroupi(arthur_t *arthur){
 
 void arthur_check_si_dans_le_vide(arthur_t *arthur){
     char str1[10];
-    u16 nombre = FIX_POINT(10,50);
-    snprintf(str1, 30, "tilex %3d", arthur->tile_bottom); ng_text(2, 3, 0, str1);
+    //u16 nombre = FIX_POINT(10,50);
+    //snprintf(str1, 30, "tilex %3d", arthur->tile_bottom); ng_text(2, 3, 0, str1);
 }

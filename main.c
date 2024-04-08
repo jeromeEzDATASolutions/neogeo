@@ -38,7 +38,7 @@ extern u8 bios_p1current;
 // --- States for Arthur
 #define ARTHUR_SUR_LE_SOL 0
 #define ARTHUR_SUR_ECHELLE 1
-#define ARTHUR_SAUTE 2
+#define ARTHUR_SAUTE_VERTICALEMENT 2
 
 // --- Positions for Arthur
 #define ARTHUR_DEBOUT 0
@@ -114,6 +114,13 @@ int main(void) {
             frames=0;
         }
 
+        u8 u=(bios_p1current & CNT_UP);
+        u8 d=(bios_p1current & CNT_DOWN);
+        u8 l=(bios_p1current & CNT_LEFT);
+        u8 r=(bios_p1current & CNT_RIGHT);
+        u8 b1=(bios_p1current & 16);
+        u8 b2=(bios_p1current & 32);
+
         if ( DEBUG ){
             //snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
             //snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
@@ -166,7 +173,7 @@ int main(void) {
             }
         }
         else if ( bios_p1current & CNT_UP ){
-            arthur_jump(&arthur);
+            
         }
         else {
             // Position neutre de Arthur
@@ -174,18 +181,25 @@ int main(void) {
             arthur_stop_walk(&arthur);
         }
 
+        // ---------------------------------------- //
+        // --- Appui sur button B : on saute        //
+        // ---------------------------------------- //
+        if ( b2 && !l && !r){
+            arthur_jump_vertical(&arthur);
+        }
+
         arthur_check_si_dans_le_vide(&arthur);
 
         // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
         // fadeInPalette(palettes1, 2);
 
-        snprintf(str, 30, "Arthur Y %3d", arthur.y); ng_text(2, 3, 0, str);
+        // snprintf(str, 30, "Arthur Y %3d", arthur.y); ng_text(2, 3, 0, str);
 
-        if ( arthur.state == ARTHUR_SAUTE ) {
+        if ( arthur.state == ARTHUR_SAUTE_VERTICALEMENT ) {
             arthur_jump_update(&arthur);
-            if ( arthur_walk_right(&arthur) ) {
+            /*if ( arthur_walk_right(&arthur) ) {
                 scroll_right();
-            }
+            }*/
         }
 
         ng_wait_vblank();
