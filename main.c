@@ -128,7 +128,13 @@ int main(void) {
             //snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
         }
 
-        if (bios_p1current == 6 || bios_p1current == 2 || bios_p1current == 10 ){
+        if (bios_p1current == 2 && arthur.y > 0){
+            arthur.y--;
+            arthur.position_y--;
+            arthur_update(&arthur);
+            arthur_calcule_tiles(&arthur);
+        }
+        else if (bios_p1current == 6999 || bios_p1current == 2999 || bios_p1current == 10999 ){
             // --- Arthur se baisse
             arthur.position=ARTHUR_CROUCHING;
             arthur_accroupi(&arthur);
@@ -183,6 +189,11 @@ int main(void) {
             }
         }
         else if ( bios_p1current & CNT_UP ){
+
+            arthur.y++;
+            arthur.position_y++;
+            arthur_update(&arthur);
+            arthur_calcule_tiles(&arthur);
             
         }
         else {

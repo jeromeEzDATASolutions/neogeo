@@ -23,6 +23,7 @@ static void arthur_jump_vertical();
 static void arthur_jump_horizontal();
 static void arthur_jump_update();
 static void arthur_check_si_dans_le_vide();
+static void arthur_calcule_tiles();
 
 typedef struct _arthur_t {
     u16 sprite;
@@ -57,10 +58,10 @@ arthur_t arthur = {
     .width = 2, // 32 * 16 = 512 pixels
     .height = 2,
     .x = 144,
-    .y = 31,
+    .y = 32,
     .tmx = {},
     .position_x = 144,
-    .position_y = 31,
+    .position_y = 32,
     .sens = 1,
     .frames = 0, 
     .state = ARTHUR_SUR_LE_SOL,
@@ -68,7 +69,7 @@ arthur_t arthur = {
     .tiley = 0, 
     .velocity = 0,
     .tile_bottom = 0,
-    .yf = 31*8,
+    .yf = 32*8,
     .saut_up = 0,
     .saut_down = 0, 
 };
@@ -147,9 +148,7 @@ int arthur_walk_left(arthur_t *arthur){
     }
 
     // --- On determine la tile sur laquelle est Arthur
-    arthur->tilex = (arthur->position_x>>4)+1;
-    arthur->tiley = 15-((arthur->position_y>>4)+2);
-    arthur->tile_bottom = background.tmx[arthur->tiley][arthur->tilex];
+    arthur_calcule_tiles(arthur);
 
     // Arthur ne peut marcher que sur le sol : tile 401
     //if ( background.tmx[13][arthur->tilex] == 0 ){
@@ -183,9 +182,7 @@ int arthur_walk_right(arthur_t *arthur){
     }
 
     // --- On determine la tile sur laquelle est Arthur
-    arthur->tilex = (arthur->position_x>>4)+1;
-    arthur->tiley = 15-((arthur->position_y>>4)+2);
-    arthur->tile_bottom = background.tmx[arthur->tiley+1][arthur->tilex];
+    arthur_calcule_tiles(arthur);
 
     // Arthur ne peut marcher que sur le sol : tile 401
     u16 tile_on_right = arthur->tilex+1;
@@ -288,9 +285,7 @@ void arthur_jump_update(arthur_t *arthur){
         arthur->position_y = arthur->y;
 
         // --- On determine la tile sur laquelle est Arthur
-        arthur->tilex = (arthur->position_x>>4)+1;
-        arthur->tiley = 15-(((arthur->position_y+1)>>4)+2);
-        arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
+        arthur_calcule_tiles(arthur);
 
         // --- arthur->y == 31 
         if ( arthur->saut_down && arthur->tile_bottom == 267 ){
@@ -302,4 +297,10 @@ void arthur_jump_update(arthur_t *arthur){
             arthur_update(arthur);
         }
     }
+}
+
+void arthur_calcule_tiles(arthur_t *arthur){
+    arthur->tilex = (arthur->position_x>>4)+1;
+    arthur->tiley = 15-(((arthur->position_y)>>4)+1);
+    arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
 }
