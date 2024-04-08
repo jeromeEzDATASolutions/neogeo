@@ -92,8 +92,8 @@ void setup_plane(plane_t *plane) {
 void init_plane_tmx_background(plane_t *plane){
     for(u16 j = 0; j < 15; j++) {
         for(u16 i = 0; i < 224; i++) {
-            plane->tmx[j][i] = tmx_background[j][i];
-            //plane->tmx[j][i] = tmx_decor[j][i];
+            //plane->tmx[j][i] = tmx_background[j][i];
+            plane->tmx[j][i] = tmx_sol[j][i];
         }
     }
 }

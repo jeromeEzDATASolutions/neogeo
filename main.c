@@ -203,8 +203,7 @@ int main(void) {
         // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
         // fadeInPalette(palettes1, 2);
 
-        snprintf(str, 30, "Tile Y %3d", arthur.tiley); ng_text(2, 3, 0, str);
-        snprintf(str, 30, "Tile Bottom %3d", arthur.tile_bottom); ng_text(2, 5, 0, str);
+        snprintf(str, 30, "PosY %3d", arthur.velocity); ng_text(2, 3, 0, str);
 
         if ( arthur.state == ARTHUR_SAUTE_VERTICALEMENT || arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ) {
             arthur_jump_update(&arthur);
