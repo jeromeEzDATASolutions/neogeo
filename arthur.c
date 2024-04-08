@@ -167,7 +167,7 @@ void arthur_jump_update(arthur_t *arthur){
 
     // --- On affiche la tile pour le saut vertical
     if ( arthur->state == ARTHUR_SAUTE_VERTICALEMENT ){
-        arthur->tile_offset_x=8;
+        arthur->tile_offset_x=18;
         if ( arthur->sens == 1 )
             arthur->tile_offset_y=0;
         else arthur->tile_offset_y=2;
