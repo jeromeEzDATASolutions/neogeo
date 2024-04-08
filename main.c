@@ -67,6 +67,7 @@ int palette_background_herbe_nuage[] = {1,2,6};
 #include "arthur.c"
 #include "nuage.c"
 
+static void scroll_right();
 
 int main(void) {
 
@@ -125,51 +126,47 @@ int main(void) {
         }
         else if (bios_p1current & CNT_LEFT ) {
 
-            arthur.frames++;
+            if ( arthur.state == ARTHUR_SUR_LE_SOL ){
 
-            if ( background.position_x > 0 ){
+                arthur.frames++;
 
-                for ( u16 i=0;i<GAME_SPEED;i++){
-                    move_planes_left();
-                    nuage_move_left(&nuage);
-                    if ( background.position_x == 200 ){
-                        // Display nuage
-                        nuage.height=GNG_NUAGE_TMX_HEIGHT;
-                        nuage_setup(&nuage);
+                if ( background.position_x > 0 ){
+
+                    for ( u16 i=0;i<GAME_SPEED;i++){
+                        move_planes_left();
+                        nuage_move_left(&nuage);
+                        if ( background.position_x == 200 ){
+                            // Display nuage
+                            nuage.height=GNG_NUAGE_TMX_HEIGHT;
+                            nuage_setup(&nuage);
+                        }
                     }
-                }
 
-                // Moves Arthur on left
-                arthur.position=ARTHUR_DEBOUT;
-                arthur.position_x--;
-                arthur_walk_left(&arthur);
-            }
-            else {
-                // --- Arthur fait dur surplace
-                arthur_walk_left(&arthur);
+                    // Moves Arthur on left
+                    arthur.position=ARTHUR_DEBOUT;
+                    arthur.position_x--;
+                    arthur_walk_left(&arthur);
+                }
+                else {
+                    // --- Arthur fait dur surplace
+                    arthur_walk_left(&arthur);
+                }
             }
         }
         else if (bios_p1current & CNT_RIGHT && background.position_x < 3260 ) {
 
-            arthur.frames++;
+            if ( arthur.state == ARTHUR_SUR_LE_SOL ){
 
-            // Move background & nuage
-            for ( u16 i=0;i<GAME_SPEED;i++){
-                move_planes_right();
-                nuage_move_right(&nuage);
-                if ( background.position_x == 200 ){
-                    // Hide nuage
-                    nuage_hide(&nuage);
+                arthur.frames++;
+
+                // Moves Arthur on right            
+                if ( arthur_walk_right(&arthur) ) {
+                    scroll_right();
                 }
             }
-
-            // Moves Arthur on right
-            arthur.position=ARTHUR_DEBOUT;
-            arthur.position_x++;
-            arthur_walk_right(&arthur);
         }
         else if ( bios_p1current & CNT_UP ){
-            
+            arthur_jump(&arthur);
         }
         else {
             // Position neutre de Arthur
@@ -177,13 +174,33 @@ int main(void) {
             arthur_stop_walk(&arthur);
         }
 
+        arthur_check_si_dans_le_vide(&arthur);
+
         // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
         // fadeInPalette(palettes1, 2);
 
-        snprintf(str, 10, "Tile %3d", background.tmx[13][arthur.tile]); ng_text(2, 3, 0, str);
+        snprintf(str, 30, "Arthur Y %3d", arthur.y); ng_text(2, 3, 0, str);
+
+        if ( arthur.state == ARTHUR_SAUTE ) {
+            arthur_jump_update(&arthur);
+            if ( arthur_walk_right(&arthur) ) {
+                scroll_right();
+            }
+        }
 
         ng_wait_vblank();
     }
 
     return 0;
+}
+
+void scroll_right(){
+    for ( u16 i=0;i<GAME_SPEED;i++){
+        move_planes_right();
+        nuage_move_right(&nuage);
+        if ( background.position_x == 200 ){
+            // Hide nuage
+            nuage_hide(&nuage);
+        }
+    }
 }

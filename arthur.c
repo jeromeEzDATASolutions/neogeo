@@ -6,6 +6,23 @@
 #define GNG_ARTHUR_TMX_WIDTH 24
 #define GNG_ARTHUR_TMX_HEIGHT 4
 
+#define FIXED_POINT 8
+#define INT_TO_FIXED(x) ((x) << FIXED_POINT)
+#define FIXED_TO_INT(x) ((x) >> FIXED_POINT)
+#define ADD_FIXED(x, y) ((x) + (y))
+#define SUB_FIXED(x, y) ((x) - (y))
+#define MUL_FIXED(x, y) (((x) * (y)) >> FIXED_POINT)
+#define DIV_FIXED(x, y) (((x) << FIXED_POINT) / (y))
+#define JUMP_VELOCITY INT_TO_FIXED(-4)
+#define GRAVITY INT_TO_FIXED(1)
+
+static void arthur_init_tmx();
+static int arthur_walk_right();
+static void arthur_stop_walk();
+static void arthur_jump();
+static void arthur_jump_update();
+static void arthur_check_si_dans_le_vide();
+
 typedef struct _arthur_t {
     u16 sprite;
     u16 tile_offset_x;
@@ -17,11 +34,16 @@ typedef struct _arthur_t {
     s16 y;
     u16 tmx[GNG_ARTHUR_TMX_HEIGHT][GNG_ARTHUR_TMX_WIDTH];
     u16 position_x;
+    u16 position_y;
     u16 sens; // 0 left or 1 right
     u16 frames;
     u16 state; // ARTHUR_SUR_LE_SOL - ARTHUR_SUR_ECHELLE - ARTHUR_SAUTE
     u16 position; // ARTHUR_DEBOUT - ARTHUR_CROUCHING
-    u16 tile;
+    u16 tilex;
+    u16 tiley;
+    int velocity;
+    u16 tile_bottom;
+    s16 yf;
 } arthur_t;
 
 arthur_t arthur = {
@@ -35,10 +57,15 @@ arthur_t arthur = {
     .y = 31,
     .tmx = {},
     .position_x = 144,
+    .position_y = 31,
     .sens = 1,
     .frames = 0, 
-    .state = 0,
-    .tile = 0, 
+    .state = ARTHUR_SUR_LE_SOL,
+    .tilex = 0, 
+    .tiley = 0, 
+    .velocity = 0,
+    .tile_bottom = 0,
+    .yf = 31*8,
 };
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -115,19 +142,73 @@ void arthur_walk_left(arthur_t *arthur){
     }
 
     // --- On determine la tile sur laquelle est Arthur
-    arthur->tile = (arthur->position_x>>4)+1;
+    arthur->tilex = (arthur->position_x>>4)+1;
+    arthur->tiley = 15-((arthur->position_y>>4)+2);
+    arthur->tile_bottom = background.tmx[arthur->tiley][arthur->tilex];
 
     // Arthur ne peut marcher que sur le sol : tile 401
-    if ( background.tmx[13][arthur->tile] == 0 ){
+    //if ( background.tmx[13][arthur->tilex] == 0 ){
         
         // Arthur meurt - on le fait tomber
 
         // Ensuite on fait un fondu pour tout faire disparaitre
-        fadeInPalette(palette_background_herbe_nuage, 3);
-    }
+        // fadeInPalette(palette_background_herbe_nuage, 3);
+    //}
 }
 
-void arthur_walk_right(arthur_t *arthur){
+void jump(arthur_t *arthur) {
+    arthur->velocity = JUMP_VELOCITY;
+}
+
+void update(arthur_t *arthur) {
+    //if ( frames%16 == 0 ){
+        arthur->y = ADD_FIXED(arthur->y, arthur->velocity);
+        arthur->velocity = ADD_FIXED(arthur->velocity, GRAVITY);
+        if (FIXED_TO_INT(arthur->y) <= 0) {
+            arthur->y = INT_TO_FIXED(0);
+            arthur->velocity = INT_TO_FIXED(0);
+        }
+        arthur_update(arthur);
+    //}
+}
+
+void arthur_jump(arthur_t *arthur){
+
+    if ( arthur->state != ARTHUR_SAUTE ){
+        arthur->state = ARTHUR_SAUTE;
+        arthur->velocity = 35;
+    }
+
+    /*
+    arthur_stop_walk(arthur);
+    arthur->state = ARTHUR_SAUTE;
+    arthur->y+=1;
+    arthur->position_y+=1;
+    */
+
+    //arthur_update(arthur);
+}
+
+void arthur_jump_update(arthur_t *arthur){
+
+    if ( arthur->y >= 31 || arthur->state == ARTHUR_SAUTE) {
+        arthur->velocity-=2;
+        arthur->yf+=arthur->velocity;
+        arthur->y = arthur->yf/8;
+        arthur_update(arthur);
+    }
+
+    if ( arthur->y == 31 ){
+        arthur->velocity = 32;
+        arthur->state=ARTHUR_SUR_LE_SOL;
+    }
+
+    //arthur->tilex = (arthur->position_x>>4)+1;
+    //arthur->tiley = 15-((arthur->position_y>>4)+2);
+    //arthur->tile_bottom = background.tmx[arthur->tiley+1][arthur->tilex];
+}
+
+int arthur_walk_right(arthur_t *arthur){
 
     char str[10];
     arthur->sens=1;
@@ -147,16 +228,29 @@ void arthur_walk_right(arthur_t *arthur){
     }
 
     // --- On determine la tile sur laquelle est Arthur
-    arthur->tile = (arthur->position_x>>4)+1;
+    arthur->tilex = (arthur->position_x>>4)+1;
+    arthur->tiley = 15-((arthur->position_y>>4)+2);
+    arthur->tile_bottom = background.tmx[arthur->tiley+1][arthur->tilex];
 
     // Arthur ne peut marcher que sur le sol : tile 401
-    if ( background.tmx[13][arthur->tile] == 0 ){
+    u16 tile_on_right = arthur->tilex+1;
+    if ( background.tmx[arthur->tiley][tile_on_right] == 0 || 1 ){
         
-        // Arthur meurt - on le fait tomber
+        // Arthur peut marcher à droite
+        arthur->position=ARTHUR_DEBOUT;
+        arthur->position_x++;
+
+        // jump(arthur);
+        // update(arthur);
+
+        // snprintf(str, 30, "Coor X-Y %3d", FIXED_TO_INT(arthur->y)); ng_text(2, 5, 0, str);
 
         // Ensuite on fait un fondu pour tout faire disparaitre
-        fadeInPalette(palette_background_herbe_nuage, 3);
+        // fadeInPalette(palette_background_herbe_nuage, 3);
+        return 1;
     }
+
+    return 0;
 }
 
 void arthur_stop_walk(arthur_t *arthur){
@@ -183,4 +277,10 @@ void arthur_accroupi(arthur_t *arthur){
     else arthur->tile_offset_y=2;
     
     arthur_update(arthur);
+}
+
+void arthur_check_si_dans_le_vide(arthur_t *arthur){
+    char str1[10];
+    u16 nombre = FIX_POINT(10,50);
+    snprintf(str1, 30, "tilex %3d", arthur->tile_bottom); ng_text(2, 3, 0, str1);
 }
