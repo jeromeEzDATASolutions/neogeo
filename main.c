@@ -156,8 +156,6 @@ int main(void) {
                     }
                     else {
                         // Moves Arthur on left
-                        arthur.position=ARTHUR_DEBOUT;
-                        arthur.position_x--;
                         if ( arthur_walk_left(&arthur) ){
                             scroll_left();
                         }
@@ -238,8 +236,8 @@ int main(void) {
         //snprintf(str, 30, "UP %3d", arthur.saut_up); ng_text(2, 3, 0, str);
         //snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
         //snprintf(str, 30, "POSY %3d", arthur.position_y); ng_text(2, 7, 0, str);
-        //snprintf(str, 30, "TILE B %3d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 9, 0, str);
-        snprintf(str, 30, "posY %5d", arthur.position_y); ng_text(2, 3, 0, str);
+        snprintf(str, 30, "ART %5d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 3, 0, str);
+        snprintf(str, 30, "POSX %3d", arthur.position_x); ng_text(2, 5, 0, str);
 
         ng_wait_vblank();
     }

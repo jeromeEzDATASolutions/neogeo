@@ -134,6 +134,7 @@ void arthur_update(arthur_t *arthur){
 
 int arthur_walk_left(arthur_t *arthur){
 
+    char str[10];
     arthur->sens=0;
     arthur->tile_offset_y=2;
 
@@ -141,7 +142,7 @@ int arthur_walk_left(arthur_t *arthur){
         arthur->tile_offset_x=0;
     }
 
-    if ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) {
+    if ( arthur->state == ARTHUR_SUR_LE_SOL && ( arthur->frames == 4 || arthur->tile_offset_x == 0 )) {
         arthur->frames = 0;
         arthur->tile_offset_x+=2;
         if ( arthur->tile_offset_x == 18 ){
@@ -153,16 +154,20 @@ int arthur_walk_left(arthur_t *arthur){
     // --- On determine la tile sur laquelle est Arthur
     arthur_calcule_tiles(arthur);
 
-    // Arthur ne peut marcher que sur le sol : tile 401
-    //if ( background.tmx[13][arthur->tilex] == 0 ){
-        
-        // Arthur meurt - on le fait tomber
+    // fadeInPalette(palette_background_herbe_nuage, 3);
 
-        // Ensuite on fait un fondu pour tout faire disparaitre
-        // fadeInPalette(palette_background_herbe_nuage, 3);
-    //}
+    if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 ){
+        arthur->position=ARTHUR_DEBOUT;
+        if ( arthur->position_x > 144 ){
+            arthur->position_x--;
+        }
+        return 1;
+    }
+    else {
+        arthur_tombe(arthur);
+    }
 
-    return 1;
+    return 0;
 }
 
 int arthur_walk_right(arthur_t *arthur){
@@ -320,14 +325,24 @@ void arthur_calcule_tiles(arthur_t *arthur){
 void arthur_tombe(arthur_t *arthur){
     if ( arthur->state == ARTHUR_SUR_LE_SOL ){
         arthur->state = ARTHUR_TOMBE;
-        arthur->velocity = 35;
     }
 }
 
 void arthur_tombe_update(arthur_t *arthur){
-    if ( arthur->position_y > 0 ){
-        arthur->y-=10;
-        arthur->position_y-=10;
-        arthur_update(arthur);
+    if ( arthur->state == ARTHUR_TOMBE ){
+        if ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 80 ) {
+            arthur->state = ARTHUR_SUR_LE_SOL;
+            arthur->y = (15-(arthur->tiley+1))*16;
+            arthur->position_y = (15-(arthur->tiley+1))*16;
+            arthur->yf = arthur->y*8;
+        }
+        else{
+            if ( arthur->position_y > 0 ){
+                arthur->y-=10;
+                arthur->position_y-=10;
+                arthur_calcule_tiles(arthur);
+                arthur_update(arthur);
+            }
+        }
     }
 }
