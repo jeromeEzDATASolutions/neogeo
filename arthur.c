@@ -47,6 +47,7 @@ typedef struct _arthur_t {
     int velocity;
     u16 tile_bottom;
     u16 tile_right;
+    u16 tile_left;
     s16 yf;
     u8 saut_up;             // Phase montante du saut d'Arthur
     u8 saut_down;           // Phase descendante du saut d'Arthur
@@ -72,6 +73,7 @@ arthur_t arthur = {
     .velocity = 0,
     .tile_bottom = 0,
     .tile_right = 0,
+    .tile_left = 0,
     .yf = 32*8,
     .saut_up = 0,
     .saut_down = 0, 
@@ -157,11 +159,16 @@ int arthur_walk_left(arthur_t *arthur){
     // fadeInPalette(palette_background_herbe_nuage, 3);
 
     if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 ){
-        arthur->position=ARTHUR_DEBOUT;
-        if ( arthur->position_x > 144 ){
-            arthur->position_x--;
+
+        if ( arthur->tile_left == 378 || arthur->tile_left == 357 ){
         }
-        return 1;
+        else {
+            arthur->position=ARTHUR_DEBOUT;
+            if ( arthur->position_x > 144 ){
+                arthur->position_x--;
+            }
+            return 1;
+        }
     }
     else {
         arthur_tombe(arthur);
@@ -194,19 +201,24 @@ int arthur_walk_right(arthur_t *arthur){
 
     // Arthur ne peut marcher que sur le sol : tile 401
     if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 ){
-        
-        // Arthur peut marcher à droite
-        arthur->position=ARTHUR_DEBOUT;
-        arthur->position_x++;
 
-        // jump(arthur);
-        // update(arthur);
+        if ( arthur->tile_right == 377 || arthur->tile_right == 357 ) {
 
-        // snprintf(str, 30, "Coor X-Y %3d", FIXED_TO_INT(arthur->y)); ng_text(2, 5, 0, str);
+        }
+        else {
+            // Arthur peut marcher à droite
+            arthur->position=ARTHUR_DEBOUT;
+            arthur->position_x++;
 
-        // Ensuite on fait un fondu pour tout faire disparaitre
-        // fadeInPalette(palette_background_herbe_nuage, 3);
-        return 1;
+            // jump(arthur);
+            // update(arthur);
+
+            // snprintf(str, 30, "Coor X-Y %3d", FIXED_TO_INT(arthur->y)); ng_text(2, 5, 0, str);
+
+            // Ensuite on fait un fondu pour tout faire disparaitre
+            // fadeInPalette(palette_background_herbe_nuage, 3);
+            return 1;
+        }
     }
     else {
         arthur_tombe(arthur);
@@ -243,8 +255,6 @@ void arthur_accroupi(arthur_t *arthur){
 
 void arthur_check_si_dans_le_vide(arthur_t *arthur){
     char str1[10];
-    //u16 nombre = FIX_POINT(10,50);
-    //snprintf(str1, 30, "tilex %3d", arthur->tile_bottom); ng_text(2, 3, 0, str1);
 }
 
 void arthur_jump_vertical(arthur_t *arthur){
@@ -298,8 +308,7 @@ void arthur_jump_update(arthur_t *arthur){
         arthur_calcule_tiles(arthur);
 
         // --- arthur->y == 31 
-        //if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 ) ){
-        if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 80 ) ){
+        if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 377 || arthur->tile_bottom == 378 || arthur->tile_bottom == 357 || arthur->tile_bottom == 80 ) ){
             arthur->velocity = 35; // 35
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->saut_up = 0;
@@ -316,10 +325,11 @@ void arthur_jump_update(arthur_t *arthur){
 }
 
 void arthur_calcule_tiles(arthur_t *arthur){
-    arthur->tilex = (arthur->position_x>>4)+1;
+    arthur->tilex = ((arthur->position_x)>>4)+1;
     arthur->tiley = 15-((arthur->position_y>>4)+1);
     arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
     arthur->tile_right = tmx_sol[arthur->tiley][arthur->tilex+1];
+    arthur->tile_left = tmx_sol[arthur->tiley][arthur->tilex-1];
 }
 
 void arthur_tombe(arthur_t *arthur){
@@ -330,7 +340,7 @@ void arthur_tombe(arthur_t *arthur){
 
 void arthur_tombe_update(arthur_t *arthur){
     if ( arthur->state == ARTHUR_TOMBE ){
-        if ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 80 ) {
+        if ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 377 || arthur->tile_bottom == 378 || arthur->tile_bottom == 357 || arthur->tile_bottom == 80 ) {
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->y = (15-(arthur->tiley+1))*16;
             arthur->position_y = (15-(arthur->tiley+1))*16;
