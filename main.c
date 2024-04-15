@@ -26,6 +26,8 @@
 // Current state of player 1's controller
 extern u8 bios_p1current;
 
+#define CNT_BOTTOM 2
+
 /// Start of sprite tiles
 #define CROM_TILE_OFFSET 256
 
@@ -34,6 +36,7 @@ extern u8 bios_p1current;
 #define CROM_TILE_START_BACKGROUND 9 // 32
 #define CROM_TILE_START_ARTHUR 41 // 2
 #define CROM_TILE_START_HERBE 43 // 32
+#define CROM_TILE_START_TONYO 75 // 7
 
 // --- States for Arthur
 #define ARTHUR_SUR_LE_SOL 0
@@ -68,6 +71,7 @@ int palette_background_herbe_nuage[] = {1,2,6};
 #include "background.c"
 #include "arthur.c"
 #include "nuage.c"
+#include "tonyo.c"
 
 static void scroll_left();
 static void scroll_right();
@@ -80,18 +84,18 @@ int main(void) {
     init_palette();
 
     // --- Set palette 6 to black
-    setPaletteToBlack(palette_nuage, 1);
+    //setPaletteToBlack(palette_nuage, 1);
 
     // --- Set palette 1 and 2 to black
     setPaletteToBlack(palettes_background_herbe, 2);
 
     // --- Load tmx from background
     init_plane_tmx_background(&background);
-    //init_plane_tmx_herbe(&herbe);
+    init_plane_tmx_herbe(&herbe);
     
     // --- Display background (terre & herbe)
     setup_plane(&background);
-    //setup_plane(&herbe);
+    setup_plane(&herbe);
 
     // --- Display nuage
     nuage_setup(&nuage);
@@ -129,15 +133,8 @@ int main(void) {
             //snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
         }
 
-        if (bios_p1current == 2 && arthur.y > 0){
-            /*arthur.y--;
-            arthur.position_y--;
-            arthur_update(&arthur);
-            arthur_calcule_tiles(&arthur);*/
-        }
-        else if (bios_p1current == 6999 || bios_p1current == 2999 || bios_p1current == 10999 ){
+       if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10 ){
             // --- Arthur se baisse
-            arthur.position=ARTHUR_CROUCHING;
             arthur_accroupi(&arthur);
         }
         else if (bios_p1current & CNT_LEFT ) {
@@ -188,12 +185,10 @@ int main(void) {
             }
         }
         else if ( bios_p1current & CNT_UP ){
-
             /*arthur.y++;
             arthur.position_y++;
             arthur_update(&arthur);
             arthur_calcule_tiles(&arthur);*/
-            
         }
         else {
             // Position neutre de Arthur
@@ -236,8 +231,8 @@ int main(void) {
         //snprintf(str, 30, "UP %3d", arthur.saut_up); ng_text(2, 3, 0, str);
         //snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
         //snprintf(str, 30, "POSY %3d", arthur.position_y); ng_text(2, 7, 0, str);
-        snprintf(str, 30, "ART %5d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 3, 0, str);
-        snprintf(str, 30, "POSX %3d", arthur.position_x); ng_text(2, 5, 0, str);
+        //snprintf(str, 30, "ART %5d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 3, 0, str);
+        //snprintf(str, 30, "POSX %3d", arthur.position_x); ng_text(2, 5, 0, str);
 
         ng_wait_vblank();
     }
