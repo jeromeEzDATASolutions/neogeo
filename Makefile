@@ -104,30 +104,6 @@ sprites/nuage.c1 sprites/nuage.c2: sprites/nuage.png
 sprites/nuage.pal: sprites/nuage.png
 	$(PALTOOL) $< -o $@
 
-# -------------------------------------
-# mariobros
-# -------------------------------------
-sprites/mariobros.png: gfx/tiles_mariobros.png | sprites
-	$(CONVERT) $^ $^ $^ +append -crop 112x112+0+0 +repage -background black -flatten $@
-
-sprites/mariobros.c1 sprites/mariobros.c2: sprites/mariobros.png
-	$(TILETOOL) --sprite -c $< -o $@ $(@:%.c1=%).c2
-
-sprites/mariobros.pal: sprites/mariobros.png
-	$(PALTOOL) $< -o $@
-
-# tonyo_aim_guy
-sprites/tonyo_aim_guy.png: gfx/tonyo_aim_guy.png | sprites
-	$(CONVERT) $^ $^ $^ +append -crop 1024x64+0+0 +repage -background black -flatten $@
-
-sprites/tonyo_aim_guy.c1 sprites/tonyo_aim_guy.c2: sprites/tonyo_aim_guy.png
-	$(TILETOOL) --sprite -c $< -o $@ $(@:%.c1=%).c2
-
-sprites/tonyo_aim_guy.pal: sprites/tonyo_aim_guy.png
-	$(PALTOOL) $< -o $@
-
-
-
 $(ELF):	$(OBJS:%=%.o)
 	$(M68KGCC) -o $@ $^ `pkg-config --libs ngdevkit`
 
@@ -141,8 +117,6 @@ main.c: \
 	sprites/arthur1.pal \
 	sprites/arthur2.pal \
 	sprites/nuage.pal \
-	sprites/mariobros.pal \
-	sprites/tonyo_aim_guy.pal \
 
 # sound driver ROM: ngdevkit's nullsound
 MROMSIZE:=131072
@@ -162,8 +136,6 @@ $(CROM1): $(ASSETS)/rom/c1.bin \
 	sprites/arthur1.c1 \
 	sprites/arthur2.c1 \
 	sprites/nuage.c1 \
-	sprites/mariobros.c1 \
-	sprites/tonyo_aim_guy.c1 \
 	| rom
 	cat $(ASSETS)/rom/c1.bin $(filter %.c1,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 
@@ -174,8 +146,6 @@ $(CROM2): $(ASSETS)/rom/c2.bin \
 	sprites/arthur1.c2 \
 	sprites/arthur2.c2 \
 	sprites/nuage.c2 \
-	sprites/mariobros.c2 \
-	sprites/tonyo_aim_guy.c2 \
 	| rom
 	cat $(ASSETS)/rom/c2.bin $(filter %.c2,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 

@@ -160,7 +160,8 @@ int arthur_walk_left(arthur_t *arthur){
 
     if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 ){
 
-        if ( arthur->tile_left == 378 || arthur->tile_left == 357 ){
+        //if ( arthur->tile_left == 378 || arthur->tile_left == 357 ){
+        if ( arthur->tile_left == 377 || arthur->tile_left == 357 || arthur->tile_left == 358 ) {
         }
         else {
             arthur->position=ARTHUR_DEBOUT;
@@ -202,7 +203,7 @@ int arthur_walk_right(arthur_t *arthur){
     // Arthur ne peut marcher que sur le sol : tile 401
     if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 ){
 
-        if ( arthur->tile_right == 377 || arthur->tile_right == 357 ) {
+        if ( arthur->tile_right == 377 || arthur->tile_right == 357 || arthur->tile_right == 358 ) {
 
         }
         else {
@@ -325,11 +326,21 @@ void arthur_jump_update(arthur_t *arthur){
 }
 
 void arthur_calcule_tiles(arthur_t *arthur){
+
+    u16 arthur_sprite_x_left = arthur->position_x;
+    u16 arthur_sprite_x_right = arthur->position_x+27;
+
     arthur->tilex = ((arthur->position_x)>>4)+1;
     arthur->tiley = 15-((arthur->position_y>>4)+1);
+
+    // --- On determine la tile à droite d'Arthur
+    arthur->tile_right = tmx_sol[arthur->tiley][arthur_sprite_x_right>>4];
+
+    // --- On determine la tile à gauche d'Arthur
+    arthur->tile_left = tmx_sol[arthur->tiley][(arthur_sprite_x_left+4)>>4];
+
+    // --- On determine la tile sous Arthur
     arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
-    arthur->tile_right = tmx_sol[arthur->tiley][arthur->tilex+1];
-    arthur->tile_left = tmx_sol[arthur->tiley][arthur->tilex-1];
 }
 
 void arthur_tombe(arthur_t *arthur){

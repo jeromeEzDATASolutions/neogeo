@@ -71,7 +71,6 @@ int palette_background_herbe_nuage[] = {1,2,6};
 #include "background.c"
 #include "arthur.c"
 #include "nuage.c"
-#include "tonyo.c"
 
 static void scroll_left();
 static void scroll_right();
@@ -212,13 +211,17 @@ int main(void) {
             arthur_jump_update(&arthur);
             if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
                 if ( arthur.sens == 1 ){
-                    arthur.position_x++;
-                    scroll_right();
+                    if ( arthur.tile_right != 377 && arthur.tile_right != 357 && arthur.tile_right != 358 ){
+                        arthur.position_x++;
+                        scroll_right();
+                    }
                 }
                 else {
                     if ( arthur.position_x > 144 ){
-                        arthur.position_x--;
-                        scroll_left();
+                        if ( arthur.tile_left != 377 && arthur.tile_left != 357 && arthur.tile_left != 358 ){
+                            arthur.position_x--;
+                            scroll_left();
+                        }
                     }
                 }
             }
@@ -228,7 +231,7 @@ int main(void) {
             arthur_tombe_update(&arthur);
         }
 
-        //snprintf(str, 30, "UP %3d", arthur.saut_up); ng_text(2, 3, 0, str);
+        snprintf(str, 30, "TX %3d", tmx_sol[arthur.tiley][arthur.tilex]); ng_text(2, 3, 0, str);
         //snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
         //snprintf(str, 30, "POSY %3d", arthur.position_y); ng_text(2, 7, 0, str);
         //snprintf(str, 30, "ART %5d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 3, 0, str);
