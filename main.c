@@ -184,10 +184,20 @@ int main(void) {
             }
         }
         else if ( bios_p1current & CNT_UP ){
-            /*arthur.y++;
+
+            // --- Arthur peut monter à l'échelle : tile 397
+            if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 ){
+                arthur.y++;
+                arthur.position_y++;
+                arthur_update(&arthur);
+                arthur_calcule_tiles(&arthur);
+            }
+
+            /*
+            arthur.y++;
             arthur.position_y++;
             arthur_update(&arthur);
-            arthur_calcule_tiles(&arthur);*/
+            */
         }
         else {
             // Position neutre de Arthur
