@@ -61,6 +61,7 @@ plane_t herbe = {
 void setup_plane(plane_t *plane) {
 
     u16 tile_tmp;
+    u16 palette_tmp = 1;
 
     // The plane graphics are stored in the ROM as a sequence of
     // horizontal tiles. A sprite is a vertical sequence of tiles, so
@@ -69,8 +70,18 @@ void setup_plane(plane_t *plane) {
         *REG_VRAMMOD=1;
         *REG_VRAMADDR=ADDR_SCB1+((plane->sprite+s)*64);
         for (u16 v=0; v<plane->height; v++) {
+
+            // Recherche de la bonne palette
+            for(u16 k=0;k<sizeof(palettes_offset);k++){
+                if ( plane->tmx[v][s] < palettes_offset[k][0]){
+                    palette_tmp = palettes_offset[k][1];
+                    break;
+                }
+            }
+
             *REG_VRAMRW = CROM_TILE_OFFSET+plane->tmx[v][s]-1;
-            *REG_VRAMRW = (plane->palette<<8);
+            //*REG_VRAMRW = (plane->palette<<8);
+            *REG_VRAMRW = (palette_tmp<<8);
         }
     }
 

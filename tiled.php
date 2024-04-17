@@ -6,6 +6,19 @@ if (file_exists($file)) {
     $json = json_encode($xml);
     $array = json_decode($json, TRUE);
 
+    // --- Create array for palettes
+    $cpt=0;
+    $tab = [];
+    foreach( $array["tileset"] as $tileset ){
+        if ( $cpt>0){
+            $tab[] = "{" . $tileset["@attributes"]["firstgid"] . ",".$cpt."}";
+        }
+        $cpt++;
+    }
+    echo "int palettes_offset[".count($tab)."][2] = {";
+    echo implode(",", $tab);
+    echo "};\n\n";
+
     foreach ($array["layer"] as $key => $value) {
         if ( $value["@attributes"]["name"] != "test" ){
 
