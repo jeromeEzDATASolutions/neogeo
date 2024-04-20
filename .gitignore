@@ -1,0 +1,8 @@
+mister.neo
+.DS_Store
+main.o
+.gitignore
+rom.elf
+rom/
+sprites/
+tile_layers.c
