@@ -16,6 +16,9 @@
 #define JUMP_VELOCITY INT_TO_FIXED(-4)
 #define GRAVITY INT_TO_FIXED(1)
 
+#define GNG_ARTHUR_TILES_ACCROUPI 22
+#define GNG_ARTHUR_TILES_ECHELLE 24
+
 static void arthur_init_tmx();
 static int arthur_walk_right();
 static void arthur_stop_walk();
@@ -158,9 +161,8 @@ int arthur_walk_left(arthur_t *arthur){
 
     // fadeInPalette(palette_background_herbe_nuage, 3);
 
-    if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 ){
+    if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
 
-        //if ( arthur->tile_left == 378 || arthur->tile_left == 357 ){
         if ( arthur->tile_left == 377 || arthur->tile_left == 357 || arthur->tile_left == 358 ) {
         }
         else {
@@ -200,8 +202,12 @@ int arthur_walk_right(arthur_t *arthur){
     // --- On determine la tile sur laquelle est Arthur
     arthur_calcule_tiles(arthur);
 
+    if ( arthur->state == ARTHUR_SUR_ECHELLE ){
+        snprintf(str, 30, "ATB %3d", arthur->tile_right); ng_text(2, 3, 0, str);
+    }
+
     // Arthur ne peut marcher que sur le sol : tile 401
-    if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 ){
+    if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
 
         if ( arthur->tile_right == 377 || arthur->tile_right == 357 || arthur->tile_right == 358 ) {
 
@@ -236,6 +242,10 @@ void arthur_stop_walk(arthur_t *arthur){
     arthur_update(arthur);
 }
 
+void arthur_set_position(arthur_t *arthur, u16 tile_top_left){
+    arthur->tile_offset_x = tile_top_left;
+}
+
 void arthur_accroupi(arthur_t *arthur){
 
     if ( bios_p1current == 6 ){
@@ -245,14 +255,28 @@ void arthur_accroupi(arthur_t *arthur){
         arthur->sens = 1;
     }
     
-    arthur->tile_offset_x=22;
-    
+    arthur_set_position(arthur, GNG_ARTHUR_TILES_ACCROUPI);
+
+    arthur->tile_offset_y=2;
     if ( arthur->sens == 1 )
         arthur->tile_offset_y=0;
-    else arthur->tile_offset_y=2;
     
     arthur_update(arthur);
 }
+
+
+void arthur_sur_echelle(arthur_t *arthur){
+
+    arthur_set_position(arthur, GNG_ARTHUR_TILES_ECHELLE);
+
+    arthur->tile_offset_y=2;
+    if ( arthur->sens == 1 )
+        arthur->tile_offset_y=0;
+    arthur->tile_offset_y=0;
+    
+    arthur_update(arthur);
+}
+
 
 void arthur_check_si_dans_le_vide(arthur_t *arthur){
     char str1[10];
@@ -309,7 +333,7 @@ void arthur_jump_update(arthur_t *arthur){
         arthur_calcule_tiles(arthur);
 
         // --- arthur->y == 31 
-        if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 377 || arthur->tile_bottom == 378 || arthur->tile_bottom == 357 || arthur->tile_bottom == 80 ) ){
+        if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 377 || arthur->tile_bottom == 378 || arthur->tile_bottom == 357 || arthur->tile_bottom == 80 || arthur->tile_bottom == TILE_ECHELLE_END ) ){
             arthur->velocity = 35; // 35
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->saut_up = 0;
