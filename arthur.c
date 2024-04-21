@@ -3,7 +3,7 @@
  * Structure & functions for the background
  */
 
-#define GNG_ARTHUR_TMX_WIDTH 30
+#define GNG_ARTHUR_TMX_WIDTH 32
 #define GNG_ARTHUR_TMX_HEIGHT 4
 
 #define FIXED_POINT 8
