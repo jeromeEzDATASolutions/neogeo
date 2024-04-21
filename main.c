@@ -49,6 +49,11 @@ extern u8 bios_p1current;
 #define ARTHUR_DEBOUT 0
 #define ARTHUR_CROUCHING 1
 
+// --- Tiles decor
+#define TILE_ECHELLE 397
+#define TILE_ECHELLE_END 398
+
+
 /// Start of gradient tiles in BIOS ROM
 #define SROM_GRADIENT_TILE_OFFSET 1280
 
@@ -185,24 +190,36 @@ int main(void) {
         }
         else if ( bios_p1current & CNT_UP ){
 
-            // --- Arthur peut monter à l'échelle : tile 397
-            if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 ){
+             if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
+
+                // --- Arthur peut monter à l'échelle : tile 397
+                if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 || tmx_sol[arthur.tiley][arthur.tilex] == 398 ){
+                    arthur.y++;
+                    arthur.position_y++;
+                    arthur.yf = arthur.y*8;
+                    arthur.state = ARTHUR_SUR_ECHELLE;
+                    arthur_sur_echelle(&arthur); // --- Display sprite Arthur sur echelle
+                    arthur_calcule_tiles(&arthur);
+                }
+                else {
+                    arthur.state = ARTHUR_SUR_LE_SOL;
+                    arthur.position=ARTHUR_DEBOUT;
+                    arthur_stop_walk(&arthur);
+                }
+
+                /*
                 arthur.y++;
                 arthur.position_y++;
                 arthur_update(&arthur);
-                arthur_calcule_tiles(&arthur);
+                */
             }
-
-            /*
-            arthur.y++;
-            arthur.position_y++;
-            arthur_update(&arthur);
-            */
         }
         else {
-            // Position neutre de Arthur
-            arthur.position=ARTHUR_DEBOUT;
-            arthur_stop_walk(&arthur);
+            if ( arthur.state == ARTHUR_SUR_LE_SOL ){
+                // Position neutre de Arthur
+                arthur.position=ARTHUR_DEBOUT;
+                arthur_stop_walk(&arthur);
+            }
         }
 
         // ---------------------------------------- //
@@ -241,7 +258,7 @@ int main(void) {
             arthur_tombe_update(&arthur);
         }
 
-        snprintf(str, 30, "TX %3d", tmx_sol[arthur.tiley][arthur.tilex]); ng_text(2, 3, 0, str);
+        //snprintf(str, 30, "TX %3d", tmx_sol[arthur.tiley][arthur.tilex]); ng_text(2, 3, 0, str);
         //snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
         //snprintf(str, 30, "POSY %3d", arthur.position_y); ng_text(2, 7, 0, str);
         //snprintf(str, 30, "ART %5d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 3, 0, str);
