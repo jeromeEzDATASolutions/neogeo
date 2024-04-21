@@ -3,7 +3,7 @@
  * Structure & functions for the background
  */
 
-#define GNG_ARTHUR_TMX_WIDTH 24
+#define GNG_ARTHUR_TMX_WIDTH 30
 #define GNG_ARTHUR_TMX_HEIGHT 4
 
 #define FIXED_POINT 8
@@ -18,6 +18,7 @@
 
 #define GNG_ARTHUR_TILES_ACCROUPI 22
 #define GNG_ARTHUR_TILES_ECHELLE 24
+#define GNG_ARTHUR_TILES_ECHELLE_END 26
 
 static void arthur_init_tmx();
 static int arthur_walk_right();
@@ -54,6 +55,7 @@ typedef struct _arthur_t {
     s16 yf;
     u8 saut_up;             // Phase montante du saut d'Arthur
     u8 saut_down;           // Phase descendante du saut d'Arthur
+    u16 frame_echelle;
 } arthur_t;
 
 arthur_t arthur = {
@@ -80,6 +82,7 @@ arthur_t arthur = {
     .yf = 32*8,
     .saut_up = 0,
     .saut_down = 0, 
+    .frame_echelle = 0, 
 };
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -264,19 +267,41 @@ void arthur_accroupi(arthur_t *arthur){
     arthur_update(arthur);
 }
 
-
 void arthur_sur_echelle(arthur_t *arthur){
 
     arthur_set_position(arthur, GNG_ARTHUR_TILES_ECHELLE);
 
-    arthur->tile_offset_y=2;
-    if ( arthur->sens == 1 )
-        arthur->tile_offset_y=0;
-    arthur->tile_offset_y=0;
-    
+    // On alterne le sprite d'arthur qui monte à l'échelle en jouant sur Y
+    if ( arthur->frame_echelle == 8 ){
+        if ( arthur->tile_offset_y == 0 ){
+            arthur->tile_offset_y=2;
+        }
+        else {
+            arthur->tile_offset_y=0;
+        }
+        arthur->frame_echelle = 0;
+    }
+
     arthur_update(arthur);
 }
 
+void arthur_sur_echelle_last_etape(arthur_t *arthur){
+
+    arthur_set_position(arthur, GNG_ARTHUR_TILES_ECHELLE_END);
+
+    // On alterne le sprite d'arthur qui monte à l'échelle en jouant sur Y
+    if ( arthur->frame_echelle == 8 ){
+        if ( arthur->tile_offset_y == 0 ){
+            arthur->tile_offset_y=2;
+        }
+        else {
+            arthur->tile_offset_y=0;
+        }
+        arthur->frame_echelle = 0;
+    }
+
+    arthur_update(arthur);
+}
 
 void arthur_check_si_dans_le_vide(arthur_t *arthur){
     char str1[10];
