@@ -138,8 +138,10 @@ int main(void) {
         }
 
        if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10 ){
-            // --- Arthur se baisse
-            arthur_accroupi(&arthur);
+            if ( arthur.state == ARTHUR_SUR_LE_SOL ){
+                // --- Arthur se baisse
+                arthur_accroupi(&arthur);
+            }
         }
         else if (bios_p1current & CNT_LEFT ) {
 
