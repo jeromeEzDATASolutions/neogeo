@@ -195,12 +195,22 @@ int main(void) {
              if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
 
                 // --- Arthur peut monter à l'échelle : tile 397
-                if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 || tmx_sol[arthur.tiley][arthur.tilex] == 398 ){
+                if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 ){
                     arthur.y++;
                     arthur.position_y++;
                     arthur.yf = arthur.y*8;
                     arthur.state = ARTHUR_SUR_ECHELLE;
+                    arthur.frame_echelle++;
                     arthur_sur_echelle(&arthur); // --- Display sprite Arthur sur echelle
+                    arthur_calcule_tiles(&arthur);
+                }
+                else if ( tmx_sol[arthur.tiley][arthur.tilex] == 398 ){
+                    arthur.y++;
+                    arthur.position_y++;
+                    arthur.yf = arthur.y*8;
+                    arthur.state = ARTHUR_SUR_ECHELLE;
+                    arthur.frame_echelle++;
+                    arthur_sur_echelle_last_etape(&arthur); // --- Display last etape from sprite Arthur sur echelle
                     arthur_calcule_tiles(&arthur);
                 }
                 else {
