@@ -3,7 +3,7 @@
  * Structure & functions for the background
  */
 
-#define GNG_ARTHUR_TMX_WIDTH 32
+#define GNG_ARTHUR_TMX_WIDTH 34
 #define GNG_ARTHUR_TMX_HEIGHT 4
 
 #define FIXED_POINT 8
@@ -19,6 +19,7 @@
 #define GNG_ARTHUR_TILES_ACCROUPI 22
 #define GNG_ARTHUR_TILES_ECHELLE 24
 #define GNG_ARTHUR_TILES_ECHELLE_END 26
+#define GNG_ARTHUR_TILES_CUL 32
 
 static void arthur_init_tmx();
 static int arthur_walk_right();
@@ -42,6 +43,7 @@ typedef struct _arthur_t {
     u16 tmx[GNG_ARTHUR_TMX_HEIGHT][GNG_ARTHUR_TMX_WIDTH];
     u16 position_x;
     u16 position_y;
+    u16 display_y;          // y to display arthur on the screen. It's juste for the display
     u16 sens;               // 0 left or 1 right
     u16 frames;
     u16 state;              // ARTHUR_SUR_LE_SOL - ARTHUR_SUR_ECHELLE - ARTHUR_SAUTE
@@ -56,6 +58,7 @@ typedef struct _arthur_t {
     u8 saut_up;             // Phase montante du saut d'Arthur
     u8 saut_down;           // Phase descendante du saut d'Arthur
     u16 frame_echelle;
+    u16 frame_echelle_end;
 } arthur_t;
 
 arthur_t arthur = {
@@ -70,6 +73,7 @@ arthur_t arthur = {
     .tmx = {},
     .position_x = 144,
     .position_y = 32,
+    .display_y = -2,
     .sens = 1,
     .frames = 0, 
     .state = ARTHUR_SUR_LE_SOL,
@@ -83,6 +87,7 @@ arthur_t arthur = {
     .saut_up = 0,
     .saut_down = 0, 
     .frame_echelle = 0, 
+    .frame_echelle_end = 0, 
 };
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -111,7 +116,7 @@ void arthur_setup(arthur_t *arthur) {
     // sprite shape: position , max zoom
     *REG_VRAMADDR=ADDR_SCB2+arthur->sprite;
     *REG_VRAMRW=0xFFF;
-    *REG_VRAMRW=(arthur->y-208<<7)+arthur->height;
+    *REG_VRAMRW=(arthur->y-208+arthur->display_y<<7)+arthur->height;
     *REG_VRAMRW=(arthur->x<<7);
 
     // --- On chaine l'ensemble des sprites
@@ -136,7 +141,7 @@ void arthur_update(arthur_t *arthur){
     *REG_VRAMMOD=0x200;
     *REG_VRAMADDR=ADDR_SCB2+arthur->sprite;
     *REG_VRAMRW=0xFFF;
-    *REG_VRAMRW=(arthur->y-208<<7)+arthur->height;
+    *REG_VRAMRW=(arthur->y-208+arthur->display_y<<7)+arthur->height;
     *REG_VRAMRW=(arthur->x<<7);
 }
 
@@ -287,7 +292,29 @@ void arthur_sur_echelle(arthur_t *arthur){
 
 void arthur_sur_echelle_last_etape(arthur_t *arthur){
 
+    char str[10];
+
     arthur_set_position(arthur, GNG_ARTHUR_TILES_ECHELLE_END);
+
+    arthur->frame_echelle_end++;
+    if ( arthur->frame_echelle_end >= 3 && arthur->frame_echelle_end <=12 ){
+        arthur->display_y--;
+    }
+    else if ( arthur->frame_echelle_end > 12 ){
+        if ( arthur->frame_echelle_end == 12 ){
+            arthur->display_y = 0;
+        }
+        else if ( arthur->frame_echelle_end == 13 ){
+            arthur->display_y = -1;
+        }
+        else if ( arthur->frame_echelle_end == 14 ){
+            arthur->display_y = -2;
+        }
+        else if ( arthur->frame_echelle_end == 15 ){
+            arthur->display_y = -3;
+        }
+        arthur_set_position(arthur, GNG_ARTHUR_TILES_CUL);
+    }
 
     // On alterne le sprite d'arthur qui monte à l'échelle en jouant sur Y
     if ( arthur->frame_echelle == 8 ){
@@ -301,6 +328,8 @@ void arthur_sur_echelle_last_etape(arthur_t *arthur){
     }
 
     arthur_update(arthur);
+
+    snprintf(str, 30, "End %3d", arthur->frame_echelle_end); ng_text(2, 3, 0, str);
 }
 
 void arthur_check_si_dans_le_vide(arthur_t *arthur){
