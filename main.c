@@ -203,6 +203,7 @@ int main(void) {
                     arthur.frame_echelle++;
                     arthur_sur_echelle(&arthur); // --- Display sprite Arthur sur echelle
                     arthur_calcule_tiles(&arthur);
+                    arthur.frame_echelle_end=0;
                 }
                 else if ( tmx_sol[arthur.tiley][arthur.tilex] == 398 ){
                     arthur.y++;
@@ -217,6 +218,8 @@ int main(void) {
                     arthur.state = ARTHUR_SUR_LE_SOL;
                     arthur.position=ARTHUR_DEBOUT;
                     arthur_stop_walk(&arthur);
+                    arthur.display_y = -2;
+                    arthur.frame_echelle_end=0;
                 }
 
                 /*
