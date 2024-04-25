@@ -329,7 +329,7 @@ void arthur_sur_echelle_last_etape(arthur_t *arthur){
 
     arthur_update(arthur);
 
-    snprintf(str, 30, "End %3d", arthur->frame_echelle_end); ng_text(2, 3, 0, str);
+    //snprintf(str, 30, "End %3d", arthur->frame_echelle_end); ng_text(2, 3, 0, str);
 }
 
 void arthur_check_si_dans_le_vide(arthur_t *arthur){

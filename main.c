@@ -142,6 +142,26 @@ int main(void) {
                 // --- Arthur se baisse
                 arthur_accroupi(&arthur);
             }
+            else if ( arthur.state == ARTHUR_SUR_ECHELLE ){
+
+                snprintf(str, 30, "TY %3d", tmx_sol[arthur.tiley][arthur.tilex]); ng_text(2, 3, 0, str);
+
+                arthur.y--;
+                arthur.position_y--;
+                arthur.yf = arthur.y*8;
+                //arthur.state = ARTHUR_SUR_ECHELLE;
+                arthur.frame_echelle++;
+                arthur_sur_echelle(&arthur); // --- Display sprite Arthur sur echelle
+                arthur_calcule_tiles(&arthur);
+                arthur.frame_echelle_end=0;
+
+                if ( tmx_sol[arthur.tiley][arthur.tilex] == 375 ){
+                    arthur.state = ARTHUR_SUR_LE_SOL;
+                    arthur.y = (15-(arthur.tiley))*16;
+                    arthur.position_y = (15-(arthur.tiley))*16;
+                    arthur.yf = arthur.y*8;
+                }
+            }
         }
         else if (bios_p1current & CNT_LEFT ) {
 
@@ -192,10 +212,13 @@ int main(void) {
         }
         else if ( bios_p1current & CNT_UP ){
 
-             if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
+            snprintf(str, 30, "ATY %3d", tmx_sol[arthur.tiley][arthur.tilex]); ng_text(2, 3, 0, str);
+            snprintf(str, 30, "AS %3d", arthur.state); ng_text(2, 5, 0, str);
+
+            if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
 
                 // --- Arthur peut monter à l'échelle : tile 397
-                if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 ){
+                if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 || tmx_sol[arthur.tiley][arthur.tilex] == 375 ){
                     arthur.y++;
                     arthur.position_y++;
                     arthur.yf = arthur.y*8;
