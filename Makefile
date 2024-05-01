@@ -107,7 +107,7 @@ sprites/nuage.pal: sprites/nuage.png
 # -------------------------------------
 # Lance
 # -------------------------------------
-sprites/lance.png: gfx/gng_lance.png | sprites
+sprites/lance.png: gfx/tiles_lance.png | sprites
 	$(CONVERT) $^ $^ $^ +append -crop 64x16+0+0 +repage -background black -flatten $@
 
 sprites/lance.c1 sprites/lance.c2: sprites/lance.png
