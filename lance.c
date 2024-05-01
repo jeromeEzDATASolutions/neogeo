@@ -123,7 +123,15 @@ void lance_update(lance_t *p_lance){
 
 void lance_start(lance_t p_lances[], s16 arthur_x, s16 arthur_y) {
 
-    if ( lances[arthur.frame_lance].state == ARTHUR_LANCE_STATE_CACHEE && (frames%4)==0) {
+    u8 all_lances_cachees = 1;
+
+    for (u16 s=0; s<3; s++) {
+        if ( lances[s].state != ARTHUR_LANCE_STATE_CACHEE ){
+            all_lances_cachees = 0;
+        }
+    }
+
+    if ( all_lances_cachees == 1 || (lances[arthur.frame_lance].state == ARTHUR_LANCE_STATE_CACHEE && (frames%5)==0)) {
 
         if ( arthur.sens == 1 ){
             lances[arthur.frame_lance].x = arthur_x + 20;
