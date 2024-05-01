@@ -115,11 +115,10 @@ int main(void) {
     // --- Display sprite Arthur
     arthur_setup(&arthur);
 
-    // --- Display sprite Lance
-    lance.y=260;
-    lance_init(&lances[0]);
-    lance_init(&lances[1]);
-    lance_init(&lances[2]);
+    // --- Display sprites Lances
+    lances_init(lances);
+    lance_update(&lances[0]);
+    //snprintf(str, 10, "POS %4d", lances[0].x); ng_text(2, 3, 0, str);
 
     // --- Display nuages
     fadeOutPalette(palette_nuage, 1);
@@ -128,10 +127,6 @@ int main(void) {
     fadeOutPalette(palettes_background_herbe, 2);
 
     for(;;) {
-
-        //lance.x += ARTHUR_LANCE_VITESSE;
-        //lance_update(&lance);
-        lance_gestion();
 
         frames++;
 
@@ -151,6 +146,8 @@ int main(void) {
             //snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
             //snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
         }
+
+        lances_gestion(lances);
 
         // --------------------------------------------------
         // --- ARTHUR BOTTOM
@@ -245,7 +242,7 @@ int main(void) {
             }
         }
         else if ( b1 ) {
-            lance_start(arthur.x, arthur.y);
+            lance_start(lances, arthur.x, arthur.y);
         }
         else if ( arthur.state == ARTHUR_SUR_LE_SOL ){
             // Position neutre de Arthur
@@ -257,7 +254,7 @@ int main(void) {
         // --- Appui sur button A : on tire         //
         // ---------------------------------------- //
         if ( b1 ) {
-            lance_start(arthur.x, arthur.y);
+            lance_start(lances, arthur.x, arthur.y);
         }
 
         // ---------------------------------------- //

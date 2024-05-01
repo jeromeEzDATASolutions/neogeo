@@ -61,6 +61,7 @@ typedef struct _arthur_t {
     u8 saut_down;           // Phase descendante du saut d'Arthur
     u16 frame_echelle;
     u16 frame_echelle_end;
+    u16 frame_lance;
 } arthur_t;
 
 arthur_t arthur = {
@@ -90,6 +91,7 @@ arthur_t arthur = {
     .saut_down = 0, 
     .frame_echelle = 0, 
     .frame_echelle_end = 0, 
+    .frame_lance = 0, 
 };
 
 void arthur_init_tmx(arthur_t *arthur){
