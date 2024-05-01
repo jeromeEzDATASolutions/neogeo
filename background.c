@@ -86,7 +86,6 @@ void setup_plane(plane_t *plane) {
     }
 
     *REG_VRAMMOD=0x200;
-    // sprite shape: position , max zoom
     *REG_VRAMADDR=ADDR_SCB2+plane->sprite;
     *REG_VRAMRW=0xFFF;
     *REG_VRAMRW=(plane->y<<7)+plane->height;

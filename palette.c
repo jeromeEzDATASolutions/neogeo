@@ -13,6 +13,7 @@ const u16 clut[][16]= {
     #include "sprites/arthur1.pal"
     #include "sprites/arthur2.pal"
     #include "sprites/nuage.pal"
+    #include "sprites/lance.pal"
 };
 
 const u16 palette_backup[][16]= {
@@ -25,6 +26,7 @@ const u16 palette_backup[][16]= {
     #include "sprites/arthur1.pal"
     #include "sprites/arthur2.pal"
     #include "sprites/nuage.pal"
+    #include "sprites/lance.pal"
 };
 
 const u16 paletes_from_tile[][2] = {
@@ -33,7 +35,8 @@ const u16 paletes_from_tile[][2] = {
     {417, 3}, 
     {427, 4}, 
     {547, 5}, 
-    {643, 6},
+    {667, 6},
+    {709, 7},
 };
 
 void init_palette() {

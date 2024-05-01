@@ -4,7 +4,7 @@
  */
 
 #define GNG_ARTHUR_TMX_WIDTH 34
-#define GNG_ARTHUR_TMX_HEIGHT 4
+#define GNG_ARTHUR_TMX_HEIGHT 7
 
 #define FIXED_POINT 8
 #define INT_TO_FIXED(x) ((x) << FIXED_POINT)
@@ -30,6 +30,8 @@ static void arthur_jump_update();
 static void arthur_check_si_dans_le_vide();
 static void arthur_calcule_tiles();
 static void arthur_tombe();
+static void arthur_sur_echelle_last_etape();
+static void arthur_sur_echelle();
 
 typedef struct _arthur_t {
     u16 sprite;
@@ -211,7 +213,7 @@ int arthur_walk_right(arthur_t *arthur){
     arthur_calcule_tiles(arthur);
 
     if ( arthur->state == ARTHUR_SUR_ECHELLE ){
-        snprintf(str, 30, "ATB %3d", arthur->tile_right); ng_text(2, 3, 0, str);
+        //snprintf(str, 30, "ATB %3d", arthur->tile_right); ng_text(2, 3, 0, str);
     }
 
     // Arthur ne peut marcher que sur le sol : tile 401
@@ -268,8 +270,53 @@ void arthur_accroupi(arthur_t *arthur){
     arthur->tile_offset_y=2;
     if ( arthur->sens == 1 )
         arthur->tile_offset_y=0;
+
+    arthur->position = ARTHUR_ACCROUPI;
     
     arthur_update(arthur);
+}
+
+int arthur_descend_echelle(arthur_t *arthur){
+
+    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+        // --- On checke si la tuile sous Arthur est une fin d'echelle
+        if ( arthur->tile_bottom == 398 ){
+
+            // On commence par la derniere etape
+            // TODO
+            arthur->y++;
+            arthur->position_y++;
+            arthur->yf = arthur->y*8;
+            arthur->state = ARTHUR_SUR_ECHELLE;
+            arthur->frame_echelle++;
+            arthur_sur_echelle_last_etape(arthur); // --- Display last etape from sprite Arthur sur echelle
+            arthur_calcule_tiles(arthur);
+
+        }
+        else {
+            // --- Arthur se baisse
+            arthur_accroupi(arthur);
+        }
+    }
+    else if ( arthur->state == ARTHUR_SUR_ECHELLE ){
+        arthur->y--;
+        arthur->position_y--;
+        arthur->yf = arthur->y*8;
+        //arthur->state = ARTHUR_SUR_ECHELLE;
+        arthur->frame_echelle++;
+        arthur_sur_echelle(arthur); // --- Display sprite Arthur sur echelle
+        arthur_calcule_tiles(arthur);
+        arthur->frame_echelle_end=0;
+
+        if ( tmx_sol[arthur->tiley][arthur->tilex] == 375 ){
+            arthur->state = ARTHUR_SUR_LE_SOL;
+            arthur->y = (15-(arthur->tiley))*16;
+            arthur->position_y = (15-(arthur->tiley))*16;
+            arthur->yf = arthur->y*8;
+        }
+    }
+
+    return 1;
 }
 
 void arthur_sur_echelle(arthur_t *arthur){

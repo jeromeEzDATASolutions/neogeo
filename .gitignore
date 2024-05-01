@@ -3,6 +3,6 @@ mister.neo
 main.o
 .gitignore
 rom.elf
+sprites
 rom/
-sprites/
 tile_layers.c
