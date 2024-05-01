@@ -36,7 +36,9 @@ extern u8 bios_p1current;
 #define CROM_TILE_START_BACKGROUND 9 // 32
 #define CROM_TILE_START_ARTHUR 41 // 2
 #define CROM_TILE_START_HERBE 43 // 32
-#define CROM_TILE_START_TONYO 75 // 7
+#define CROM_TILE_START_LANCE1 75 // 2
+#define CROM_TILE_START_LANCE2 77 // 2
+#define CROM_TILE_START_LANCE3 79 // 2
 
 // --- States for Arthur
 #define ARTHUR_SUR_LE_SOL 0
@@ -48,6 +50,7 @@ extern u8 bios_p1current;
 // --- Positions for Arthur
 #define ARTHUR_DEBOUT 0
 #define ARTHUR_CROUCHING 1
+#define ARTHUR_ACCROUPI 2
 
 // --- Tiles decor
 #define TILE_ECHELLE 397
@@ -76,6 +79,7 @@ int palette_background_herbe_nuage[] = {1,2,6};
 #include "background.c"
 #include "arthur.c"
 #include "nuage.c"
+#include "lance.c"
 
 static void scroll_left();
 static void scroll_right();
@@ -111,6 +115,12 @@ int main(void) {
     // --- Display sprite Arthur
     arthur_setup(&arthur);
 
+    // --- Display sprite Lance
+    lance.y=260;
+    lance_init(&lances[0]);
+    lance_init(&lances[1]);
+    lance_init(&lances[2]);
+
     // --- Display nuages
     fadeOutPalette(palette_nuage, 1);
 
@@ -118,6 +128,10 @@ int main(void) {
     fadeOutPalette(palettes_background_herbe, 2);
 
     for(;;) {
+
+        //lance.x += ARTHUR_LANCE_VITESSE;
+        //lance_update(&lance);
+        lance_gestion();
 
         frames++;
 
@@ -133,35 +147,16 @@ int main(void) {
         u8 b2=(bios_p1current & 32);
 
         if ( DEBUG ){
+            //snprintf(str, 10, "POS %4d", arthur.position); ng_text(2, 3, 0, str);
             //snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
             //snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
         }
 
-       if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10 ){
-            if ( arthur.state == ARTHUR_SUR_LE_SOL ){
-                // --- Arthur se baisse
-                arthur_accroupi(&arthur);
-            }
-            else if ( arthur.state == ARTHUR_SUR_ECHELLE ){
-
-                snprintf(str, 30, "TY %3d", tmx_sol[arthur.tiley][arthur.tilex]); ng_text(2, 3, 0, str);
-
-                arthur.y--;
-                arthur.position_y--;
-                arthur.yf = arthur.y*8;
-                //arthur.state = ARTHUR_SUR_ECHELLE;
-                arthur.frame_echelle++;
-                arthur_sur_echelle(&arthur); // --- Display sprite Arthur sur echelle
-                arthur_calcule_tiles(&arthur);
-                arthur.frame_echelle_end=0;
-
-                if ( tmx_sol[arthur.tiley][arthur.tilex] == 375 ){
-                    arthur.state = ARTHUR_SUR_LE_SOL;
-                    arthur.y = (15-(arthur.tiley))*16;
-                    arthur.position_y = (15-(arthur.tiley))*16;
-                    arthur.yf = arthur.y*8;
-                }
-            }
+        // --------------------------------------------------
+        // --- ARTHUR BOTTOM
+        // --------------------------------------------------
+        if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10){
+            u16 retour_descend_echelle = arthur_descend_echelle(&arthur);
         }
         else if (bios_p1current & CNT_LEFT ) {
 
@@ -212,9 +207,6 @@ int main(void) {
         }
         else if ( bios_p1current & CNT_UP ){
 
-            snprintf(str, 30, "ATY %3d", tmx_sol[arthur.tiley][arthur.tilex]); ng_text(2, 3, 0, str);
-            snprintf(str, 30, "AS %3d", arthur.state); ng_text(2, 5, 0, str);
-
             if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
 
                 // --- Arthur peut monter à l'échelle : tile 397
@@ -252,12 +244,20 @@ int main(void) {
                 */
             }
         }
-        else {
-            if ( arthur.state == ARTHUR_SUR_LE_SOL ){
-                // Position neutre de Arthur
-                arthur.position=ARTHUR_DEBOUT;
-                arthur_stop_walk(&arthur);
-            }
+        else if ( b1 ) {
+            lance_start(arthur.x, arthur.y);
+        }
+        else if ( arthur.state == ARTHUR_SUR_LE_SOL ){
+            // Position neutre de Arthur
+            arthur.position=ARTHUR_DEBOUT;
+            arthur_stop_walk(&arthur);
+        }
+
+        // ---------------------------------------- //
+        // --- Appui sur button A : on tire         //
+        // ---------------------------------------- //
+        if ( b1 ) {
+            lance_start(arthur.x, arthur.y);
         }
 
         // ---------------------------------------- //
@@ -295,12 +295,6 @@ int main(void) {
         else if ( arthur.state == ARTHUR_TOMBE ) {
             arthur_tombe_update(&arthur);
         }
-
-        //snprintf(str, 30, "TX %3d", tmx_sol[arthur.tiley][arthur.tilex]); ng_text(2, 3, 0, str);
-        //snprintf(str, 30, "DOWN %3d", arthur.saut_down); ng_text(2, 5, 0, str);
-        //snprintf(str, 30, "POSY %3d", arthur.position_y); ng_text(2, 7, 0, str);
-        //snprintf(str, 30, "ART %5d", tmx_sol[arthur.tiley+1][arthur.tilex]); ng_text(2, 3, 0, str);
-        //snprintf(str, 30, "POSX %3d", arthur.position_x); ng_text(2, 5, 0, str);
 
         ng_wait_vblank();
     }
