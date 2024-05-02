@@ -28,7 +28,7 @@ lance_t lances[3] = {
         .width = 2,
         .height = 1,
         .x = 100,
-        .y = 150,
+        .y = 260,
         .sens = 1, 
         .state = ARTHUR_LANCE_STATE_CACHEE, 
     }, 
@@ -40,7 +40,7 @@ lance_t lances[3] = {
         .width = 2,
         .height = 1,
         .x = 100,
-        .y = 170,
+        .y = 260,
         .sens = 1, 
         .state = ARTHUR_LANCE_STATE_CACHEE, 
     },
@@ -52,7 +52,7 @@ lance_t lances[3] = {
         .width = 2,
         .height = 1,
         .x = 100,
-        .y = 190,
+        .y = 260,
         .sens = 1, 
         .state = ARTHUR_LANCE_STATE_CACHEE, 
     },
@@ -123,37 +123,48 @@ void lance_update(lance_t *p_lance){
 
 void lance_start(lance_t p_lances[], s16 arthur_x, s16 arthur_y) {
 
-    u8 all_lances_cachees = 1;
+    // --- Arthur tire des lances sauf s'il est sur une échell
+    if ( arthur.state != ARTHUR_SUR_ECHELLE ){
 
-    for (u16 s=0; s<3; s++) {
-        if ( lances[s].state != ARTHUR_LANCE_STATE_CACHEE ){
-            all_lances_cachees = 0;
+        u8 all_lances_cachees = 1;
+
+        for (u16 s=0; s<3; s++) {
+            if ( lances[s].state != ARTHUR_LANCE_STATE_CACHEE ){
+                all_lances_cachees = 0;
+            }
+        }
+
+        if ( all_lances_cachees == 1 || (lances[arthur.frame_lance].state == ARTHUR_LANCE_STATE_CACHEE && (frames%5)==0)) {
+
+            if ( arthur.sens == 1 ){
+                lances[arthur.frame_lance].x = arthur_x + 20;
+                lances[arthur.frame_lance].y = arthur_y + 18;
+            }
+            else {
+                lances[arthur.frame_lance].x = arthur_x - 20;
+                lances[arthur.frame_lance].y = arthur_y + 18;
+            }
+
+            if ( arthur.position == ARTHUR_ACCROUPI ){
+                lances[arthur.frame_lance].y = arthur_y + 8;
+            }
+
+            lances[arthur.frame_lance].state = ARTHUR_LANCE_STATE_LANCEE;
+            lances[arthur.frame_lance].sens = arthur.sens;
+            lance_update(&lances[arthur.frame_lance]);
+
+            arthur.frame_lance = arthur.frame_lance+1;
+            if ( arthur.frame_lance == 3 ){
+                arthur.frame_lance = 0;
+            }
         }
     }
+}
 
-    if ( all_lances_cachees == 1 || (lances[arthur.frame_lance].state == ARTHUR_LANCE_STATE_CACHEE && (frames%5)==0)) {
-
-        if ( arthur.sens == 1 ){
-            lances[arthur.frame_lance].x = arthur_x + 20;
-            lances[arthur.frame_lance].y = arthur_y + 18;
-        }
-        else {
-            lances[arthur.frame_lance].x = arthur_x - 20;
-            lances[arthur.frame_lance].y = arthur_y + 18;
-        }
-
-        if ( arthur.position == ARTHUR_ACCROUPI ){
-            lances[arthur.frame_lance].y = arthur_y + 8;
-        }
-
-        lances[arthur.frame_lance].state = ARTHUR_LANCE_STATE_LANCEE;
-        lances[arthur.frame_lance].sens = arthur.sens;
-        lance_update(&lances[arthur.frame_lance]);
-
-        arthur.frame_lance = arthur.frame_lance+1;
-        if ( arthur.frame_lance == 3 ){
-            arthur.frame_lance = 0;
-        }
+void lances_hide(lance_t p_lances[]){
+    for(u16 i=0; i<3; i++){
+        lances[i].y = 260;
+        lance_update(&lances[i]);
     }
 }
 
