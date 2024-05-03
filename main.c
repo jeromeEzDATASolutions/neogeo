@@ -107,6 +107,10 @@ int main(void) {
     // --- On conserve dans un coin les infos de Arthur
     arthur_origin.palette = arthur.palette;
 
+    // Backup origin structure for reset
+    background_save(&background, &background_origin);
+    herbe_save(&herbe, &herbe_origin);
+
     for(;;) {
 
         if ( gng_niveau == 0 ){
@@ -135,7 +139,7 @@ int main(void) {
         else if ( gng_niveau == 1 ){
 
             // Scroll Map
-            for(u16 i = 0; i < 95; i++) {
+            for(u16 i = 0; i < 90; i++) {
                 map_move_left(&map);
                 ng_wait_vblank();
             }
@@ -372,8 +376,10 @@ int main(void) {
                 lances[2].y=260;
                 lances_init(lances);
 
-                // --- Reset Arthur
+                // --- Reset Arthur & Background
                 arthur_reset(&arthur, &arthur_origin);
+                background_reset(&background, &background_origin);
+                herbe_reset(&herbe, &herbe_origin);
             }
 
         }

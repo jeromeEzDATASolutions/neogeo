@@ -40,6 +40,55 @@ plane_t background = {
     .position_tile_left = 0,
 };
 
+plane_t background_origin = {
+    .sprite = 0,
+    .palette = 0,
+    .width = 0, 
+    .height = 0,
+    .x = 0,
+    .y = 0,
+    .increment = 0, 
+    .tmx = {},
+    .position_x = 0,
+    .position_x_cpt1 = 0,
+    .position_x_cpt2 = 0,
+    .position_sprite = 0,
+    .position_tile_right = 0,
+    .position_tile_left = 0,
+};
+
+void background_save(plane_t *background, plane_t *background_origin){
+    background_origin->sprite = background->sprite;
+    background_origin->palette = background->palette;
+    background_origin->width = background->width;
+    background_origin->height = background->height;
+    background_origin->x = background->x;
+    background_origin->y = background->y;
+    background_origin->increment = background->increment;
+    background_origin->position_x = background->position_x;
+    background_origin->position_x_cpt1 = background->position_x_cpt1;
+    background_origin->position_x_cpt2 = background->position_x_cpt2;
+    background_origin->position_sprite = background->position_sprite;
+    background_origin->position_tile_right = background->position_tile_right;
+    background_origin->position_tile_left = background->position_tile_left;
+}
+
+void background_reset(plane_t *background, plane_t *background_origin){
+    background->sprite = background_origin->sprite;
+    background->palette = background_origin->palette;
+    background->width = background_origin->width;
+    background->height = background_origin->height;
+    background->x = background_origin->x;
+    background->y = background_origin->y;
+    background->increment = background_origin->increment;
+    background->position_x = background_origin->position_x;
+    background->position_x_cpt1 = background_origin->position_x_cpt1;
+    background->position_x_cpt2 = background_origin->position_x_cpt2;
+    background->position_sprite = background_origin->position_sprite;
+    background->position_tile_right = background_origin->position_tile_right;
+    background->position_tile_left = background_origin->position_tile_left;
+}
+
 plane_t herbe = {
     .sprite = CROM_TILE_START_HERBE,
     .palette = 2,
@@ -56,7 +105,56 @@ plane_t herbe = {
     .position_tile_right = 0,
     .position_tile_left = 0, 
 };
-//.offset = FIX_POINT(16,0),
+
+plane_t herbe_origin= {
+    .sprite = 0, 
+    .palette = 0,
+    .width = 0,
+    .height = 0,
+    .x = 0,
+    .y = 0,
+    .increment = 0, 
+    .tmx = {},
+    .position_x = 0,
+    .position_x_cpt1 = 0,
+    .position_x_cpt2 = 0,
+    .position_sprite = 0,
+    .position_tile_right = 0,
+    .position_tile_left = 0, 
+};
+
+void herbe_save(plane_t *herbe, plane_t *herbe_origin){
+    herbe_origin->sprite = herbe->sprite;
+    herbe_origin->palette = herbe->palette;
+    herbe_origin->width = herbe->width;
+    herbe_origin->height = herbe->height;
+    herbe_origin->x = herbe->x;
+    herbe_origin->y = herbe->y;
+    herbe_origin->increment = herbe->increment;
+    herbe_origin->position_x = herbe->position_x;
+    herbe_origin->position_x_cpt1 = herbe->position_x_cpt1;
+    herbe_origin->position_x_cpt2 = herbe->position_x_cpt2;
+    herbe_origin->position_sprite = herbe->position_sprite;
+    herbe_origin->position_tile_right = herbe->position_tile_right;
+    herbe_origin->position_tile_left = herbe->position_tile_left;
+}
+
+
+void herbe_reset(plane_t *herbe, plane_t *herbe_origin){
+    herbe->sprite = herbe_origin->sprite;
+    herbe->palette = herbe_origin->palette;
+    herbe->width = herbe_origin->width;
+    herbe->height = herbe_origin->height;
+    herbe->x = herbe_origin->x;
+    herbe->y = herbe_origin->y;
+    herbe->increment = herbe_origin->increment;
+    herbe->position_x = herbe_origin->position_x;
+    herbe->position_x_cpt1 = herbe_origin->position_x_cpt1;
+    herbe->position_x_cpt2 = herbe_origin->position_x_cpt2;
+    herbe->position_sprite = herbe_origin->position_sprite;
+    herbe->position_tile_right = herbe_origin->position_tile_right;
+    herbe->position_tile_left = herbe_origin->position_tile_left;
+}
 
 void setup_plane(plane_t *plane) {
 
