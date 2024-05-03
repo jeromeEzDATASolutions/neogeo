@@ -22,8 +22,6 @@
 #include <ngdevkit/ng-fix.h>
 #include <ngdevkit/ng-video.h>
 #include <stdio.h>
-#include <time.h>
-#include <unistd.h>
 
 // Current state of player 1's controller
 extern u8 bios_p1current;
@@ -60,7 +58,6 @@ extern u8 bios_p1current;
 #define TILE_ECHELLE 397
 #define TILE_ECHELLE_END 398
 
-
 /// Start of gradient tiles in BIOS ROM
 #define SROM_GRADIENT_TILE_OFFSET 1280
 
@@ -92,6 +89,13 @@ static void scroll_right();
 
 u16 gng_niveau = 0;
 
+void pause(u8 nombre_secondes){
+    volatile int i;
+    for(i = 0; i < (25000*nombre_secondes); i++) {
+        // Pause approximative de 1 secondes
+    }
+}
+
 int main(void) {
 
     char str[10];
@@ -99,19 +103,27 @@ int main(void) {
     ng_cls();
     init_palette();
 
+    // --- Reset all sprites
+    for (u16 s=1; s<380; s++) {
+        *REG_VRAMMOD=1;
+        *REG_VRAMADDR=ADDR_SCB1+(s*64);
+        for (u16 v=0; v<15; v++) {
+            *REG_VRAMRW = CROM_TILE_OFFSET+background.tmx[0][0];
+            *REG_VRAMRW = (1<<8);
+        }
+    }
+
     for(;;) {
 
         if ( gng_niveau == 0 ){
+
             // --- Display scrolling map
             setPaletteToBlack(palettes_map, 1);
             map_setup(&map);
             fadeOutPalette(palettes_map, 1);
             
             // --- Pause de 2 secondes
-            volatile int i;
-            for(i = 0; i < 100000; i++) {
-                // Pause approximative de 1 secondes
-            }
+            pause(1);
 
             // Passage au niveau 1
             gng_niveau = 1;
@@ -121,13 +133,11 @@ int main(void) {
             // Scroll Map
             for(u16 i = 0; i < 95; i++) {
                 map_move_left(&map);
+                ng_wait_vblank();
             }
 
             // --- Pause de 2 secondes
-            volatile int i;
-            for(i = 0; i < 150000; i++) {
-                // Pause approximative de 1 secondes
-            }
+            pause(2);
 
             setPaletteToBlack(palettes_map, 1);
 
