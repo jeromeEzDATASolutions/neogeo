@@ -94,6 +94,65 @@ arthur_t arthur = {
     .frame_lance = 0, 
 };
 
+arthur_t arthur_origin = {
+    .sprite = CROM_TILE_START_ARTHUR,
+    .tile_offset_x = 0, // Décalage si besoin de la première colonne pour Arthur
+    .tile_offset_y = 0, // Arthur à gauche : ligne 2
+    .palette = 4, 
+    .width = 2, // 32 * 16 = 512 pixels
+    .height = 2,
+    .x = 144,
+    .y = 32,
+    .tmx = {},
+    .position_x = 144,
+    .position_y = 32,
+    .display_y = -2,
+    .sens = 1,
+    .frames = 0, 
+    .state = ARTHUR_SUR_LE_SOL,
+    .tilex = 0, 
+    .tiley = 0, 
+    .velocity = 0,
+    .tile_bottom = 0,
+    .tile_right = 0,
+    .tile_left = 0,
+    .yf = 32*8,
+    .saut_up = 0,
+    .saut_down = 0, 
+    .frame_echelle = 0, 
+    .frame_echelle_end = 0, 
+    .frame_lance = 0, 
+};
+
+void arthur_reset(arthur_t *arthur, arthur_t *arthur_origin){
+    arthur->sprite = arthur_origin->sprite;
+    arthur->tile_offset_x = arthur_origin->tile_offset_x;
+    arthur->tile_offset_y = arthur_origin->tile_offset_y;
+    arthur->palette = arthur_origin->palette;
+    arthur->width = arthur_origin->width;
+    arthur->height = arthur_origin->height;
+    arthur->x = arthur_origin->x;
+    arthur->y = arthur_origin->y;
+    arthur->position_x = arthur_origin->position_x;
+    arthur->position_y = arthur_origin->position_y;
+    arthur->display_y = arthur_origin->display_y;
+    arthur->sens = arthur_origin->sens;
+    arthur->frames = arthur_origin->frames;
+    arthur->state = arthur_origin->state;
+    arthur->tilex = arthur_origin->tilex;
+    arthur->tiley = arthur_origin->tiley;
+    arthur->velocity = arthur_origin->velocity;
+    arthur->tile_bottom = arthur_origin->tile_bottom;
+    arthur->tile_right = arthur_origin->tile_right;
+    arthur->tile_left = arthur_origin->tile_left;
+    arthur->yf = arthur_origin->yf;
+    arthur->saut_up = arthur_origin->saut_up;
+    arthur->saut_down = arthur_origin->saut_down;
+    arthur->frame_echelle = arthur_origin->frame_echelle;
+    arthur->frame_echelle_end = arthur_origin->frame_echelle_end;
+    arthur->frame_lance = arthur_origin->frame_lance;
+}
+
 void arthur_init_tmx(arthur_t *arthur){
     for(u16 j = 0; j < GNG_ARTHUR_TMX_HEIGHT; j++) {
         for(u16 i = 0; i < GNG_ARTHUR_TMX_WIDTH; i++) {

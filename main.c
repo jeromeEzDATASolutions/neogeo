@@ -69,6 +69,7 @@ extern u8 bios_p1current;
 
 #define DEBUG 1
 #define GAME_SPEED 1
+#define GAME_LEVEL_START 0  // 0 map, 10 level 1, 20 level 2
 
 u16 frames;
 int palettes_map[] = {8};
@@ -87,7 +88,7 @@ int palette_background_herbe_nuage[] = {1,2,6};
 static void scroll_left();
 static void scroll_right();
 
-u16 gng_niveau = 0;
+u16 gng_niveau = GAME_LEVEL_START;
 
 void pause(u8 nombre_secondes){
     volatile int i;
@@ -103,13 +104,14 @@ int main(void) {
     ng_cls();
     init_palette();
 
-    
+    // --- On conserve dans un coin les infos de Arthur
+    arthur_origin.palette = arthur.palette;
 
     for(;;) {
 
         if ( gng_niveau == 0 ){
 
-            // --- Reset all sprites
+            // Clear all sprites
             for (u16 s=1; s<380; s++) {
                 *REG_VRAMMOD=1;
                 *REG_VRAMADDR=ADDR_SCB1+(s*64);
@@ -119,12 +121,12 @@ int main(void) {
                 }
             }
 
-            // --- Display scrolling map
+            // Display map
             setPaletteToBlack(palettes_map, 1);
             map_setup(&map);
             fadeOutPalette(palettes_map, 1);
             
-            // --- Pause de 2 secondes
+            // Pause de 1 seconde
             pause(1);
 
             // Passage au niveau 1
@@ -141,9 +143,10 @@ int main(void) {
             // --- Pause de 2 secondes
             pause(2);
 
+            // Hide map with palette
             setPaletteToBlack(palettes_map, 1);
 
-            // Passage au niveau 10
+            // Passage au niveau 10 qui est le premier niveau
             gng_niveau = 10;
         }
         else if ( gng_niveau == 10 ){
@@ -174,7 +177,7 @@ int main(void) {
 
             // --- Display sprites Lances
             lances_init(lances);
-            lance_update(&lances[0]);
+            //lance_update(&lances[0]);
             //snprintf(str, 10, "POS %4d", lances[0].x); ng_text(2, 3, 0, str);
 
             // --- Display nuages
@@ -352,6 +355,27 @@ int main(void) {
             else if ( arthur.state == ARTHUR_TOMBE ) {
                 arthur_tombe_update(&arthur);
             }
+
+
+            // On checke la position Y de Arthur pour arreter le jeu
+            if ( arthur.y < -30 ){
+
+                pause(2);
+
+                gng_niveau = GAME_LEVEL_START;
+
+                map.x = 30;
+
+                // --- Reset lances
+                lances[0].y=260;
+                lances[1].y=260;
+                lances[2].y=260;
+                lances_init(lances);
+
+                // --- Reset Arthur
+                arthur_reset(&arthur, &arthur_origin);
+            }
+
         }
 
         ng_wait_vblank();
