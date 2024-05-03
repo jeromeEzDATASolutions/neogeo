@@ -103,19 +103,21 @@ int main(void) {
     ng_cls();
     init_palette();
 
-    // --- Reset all sprites
-    for (u16 s=1; s<380; s++) {
-        *REG_VRAMMOD=1;
-        *REG_VRAMADDR=ADDR_SCB1+(s*64);
-        for (u16 v=0; v<15; v++) {
-            *REG_VRAMRW = CROM_TILE_OFFSET+background.tmx[0][0];
-            *REG_VRAMRW = (1<<8);
-        }
-    }
+    
 
     for(;;) {
 
         if ( gng_niveau == 0 ){
+
+            // --- Reset all sprites
+            for (u16 s=1; s<380; s++) {
+                *REG_VRAMMOD=1;
+                *REG_VRAMADDR=ADDR_SCB1+(s*64);
+                for (u16 v=0; v<15; v++) {
+                    *REG_VRAMRW = CROM_TILE_OFFSET+background.tmx[0][0];
+                    *REG_VRAMRW = (1<<8);
+                }
+            }
 
             // --- Display scrolling map
             setPaletteToBlack(palettes_map, 1);
