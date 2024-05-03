@@ -39,6 +39,7 @@ extern u8 bios_p1current;
 #define CROM_TILE_START_LANCE1 75 // 2
 #define CROM_TILE_START_LANCE2 77 // 2
 #define CROM_TILE_START_LANCE3 79 // 2
+#define CROM_TILE_START_PONT 81 // 3
 
 // --- States for Arthur
 #define ARTHUR_SUR_LE_SOL 0
