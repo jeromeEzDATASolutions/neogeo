@@ -22,6 +22,8 @@
 #include <ngdevkit/ng-fix.h>
 #include <ngdevkit/ng-video.h>
 #include <stdio.h>
+#include <time.h>
+#include <unistd.h>
 
 // Current state of player 1's controller
 extern u8 bios_p1current;
@@ -40,6 +42,7 @@ extern u8 bios_p1current;
 #define CROM_TILE_START_LANCE2 77 // 2
 #define CROM_TILE_START_LANCE3 79 // 2
 #define CROM_TILE_START_PONT 81 // 3
+#define CROM_TILE_START_MAP 1 // 32
 
 // --- States for Arthur
 #define ARTHUR_SUR_LE_SOL 0
@@ -71,6 +74,7 @@ extern u8 bios_p1current;
 #define GAME_SPEED 1
 
 u16 frames;
+int palettes_map[] = {8};
 int palettes_background_herbe[] = {1,2};
 int palette_nuage[] = {6};
 int palette_background_herbe_nuage[] = {1,2,6};
@@ -81,9 +85,12 @@ int palette_background_herbe_nuage[] = {1,2,6};
 #include "arthur.c"
 #include "nuage.c"
 #include "lance.c"
+#include "map.c" // Intro avant d'afficher le Niveau 1
 
 static void scroll_left();
 static void scroll_right();
+
+u16 gng_niveau = 0;
 
 int main(void) {
 
@@ -92,206 +99,247 @@ int main(void) {
     ng_cls();
     init_palette();
 
-    // --- Set palette 6 to black
-    //setPaletteToBlack(palette_nuage, 1);
-
-    // --- Set palette 1 and 2 to black
-    setPaletteToBlack(palettes_background_herbe, 2);
-
-    // --- Load tmx from background
-    init_plane_tmx_background(&background);
-    init_plane_tmx_herbe(&herbe);
-    
-    // --- Display background (terre & herbe)
-    setup_plane(&background);
-    setup_plane(&herbe);
-
-    // --- Display nuage
-    nuage_setup(&nuage);
-
-    // --- Calcul
-    set_sprite_and_tile(&background);
-    set_sprite_and_tile(&herbe);
-
-    // --- Display sprite Arthur
-    arthur_setup(&arthur);
-
-    // --- Display sprites Lances
-    lances_init(lances);
-    lance_update(&lances[0]);
-    //snprintf(str, 10, "POS %4d", lances[0].x); ng_text(2, 3, 0, str);
-
-    // --- Display nuages
-    fadeOutPalette(palette_nuage, 1);
-
-    // --- Display background
-    fadeOutPalette(palettes_background_herbe, 2);
-
     for(;;) {
 
-        frames++;
+        if ( gng_niveau == 0 ){
+            // --- Display scrolling map
+            setPaletteToBlack(palettes_map, 1);
+            map_setup(&map);
+            fadeOutPalette(palettes_map, 1);
+            
+            // --- Pause de 2 secondes
+            volatile int i;
+            for(i = 0; i < 100000; i++) {
+                // Pause approximative de 1 secondes
+            }
 
-        if ( frames == 1000 ){
-            frames=0;
+            // Passage au niveau 1
+            gng_niveau = 1;
+        }
+        else if ( gng_niveau == 1 ){
+
+            // Scroll Map
+            for(u16 i = 0; i < 95; i++) {
+                map_move_left(&map);
+            }
+
+            // --- Pause de 2 secondes
+            volatile int i;
+            for(i = 0; i < 150000; i++) {
+                // Pause approximative de 1 secondes
+            }
+
+            setPaletteToBlack(palettes_map, 1);
+
+            // Passage au niveau 10
+            gng_niveau = 10;
+        }
+        else if ( gng_niveau == 10 ){
+
+            // --- Set palette 6 to black
+            //setPaletteToBlack(palette_nuage, 1);
+
+            // --- Set palette 1 and 2 to black
+            setPaletteToBlack(palettes_background_herbe, 2);
+
+            // --- Load tmx from background
+            init_plane_tmx_background(&background);
+            init_plane_tmx_herbe(&herbe);
+            
+            // --- Display background (terre & herbe)
+            setup_plane(&background);
+            setup_plane(&herbe);
+
+            // --- Display nuage
+            nuage_setup(&nuage);
+
+            // --- Calcul
+            set_sprite_and_tile(&background);
+            set_sprite_and_tile(&herbe);
+
+            // --- Display sprite Arthur
+            arthur_setup(&arthur);
+
+            // --- Display sprites Lances
+            lances_init(lances);
+            lance_update(&lances[0]);
+            //snprintf(str, 10, "POS %4d", lances[0].x); ng_text(2, 3, 0, str);
+
+            // --- Display nuages
+            fadeOutPalette(palette_nuage, 1);
+
+            // --- Display background
+            fadeOutPalette(palettes_background_herbe, 2);
+
+            gng_niveau = 11;
         }
 
-        u8 u=(bios_p1current & CNT_UP);
-        u8 d=(bios_p1current & CNT_DOWN);
-        u8 l=(bios_p1current & CNT_LEFT);
-        u8 r=(bios_p1current & CNT_RIGHT);
-        u8 b1=(bios_p1current & 16);
-        u8 b2=(bios_p1current & 32);
+        if ( gng_niveau == 11 ){
 
-        if ( DEBUG ){
-            //snprintf(str, 10, "POS %4d", arthur.position); ng_text(2, 3, 0, str);
-            //snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
-            //snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
-        }
+            frames++;
 
-        lances_gestion(lances);
+            if ( frames == 1000 ){
+                frames=0;
+            }
 
-        // --------------------------------------------------
-        // --- ARTHUR BOTTOM
-        // --------------------------------------------------
-        if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10){
-            u16 retour_descend_echelle = arthur_descend_echelle(&arthur);
-        }
-        else if (bios_p1current & CNT_LEFT ) {
+            u8 u=(bios_p1current & CNT_UP);
+            u8 d=(bios_p1current & CNT_DOWN);
+            u8 l=(bios_p1current & CNT_LEFT);
+            u8 r=(bios_p1current & CNT_RIGHT);
+            u8 b1=(bios_p1current & 16);
+            u8 b2=(bios_p1current & 32);
 
-            arthur.sens = 0;
+            if ( DEBUG ){
+                //snprintf(str, 10, "POS %4d", arthur.position); ng_text(2, 3, 0, str);
+                //snprintf(str, 10, "PX %4d", background.position_x); ng_text(2, 3, 0, str);
+                //snprintf(str, 10, "L %4d", bios_p1current); ng_text(2, 3, 0, str);
+            }
 
-            if ( arthur.state == ARTHUR_SUR_LE_SOL ){
+            lances_gestion(lances);
 
-                arthur.frames++;
+            // --------------------------------------------------
+            // --- ARTHUR BOTTOM
+            // --------------------------------------------------
+            if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10){
+                u16 retour_descend_echelle = arthur_descend_echelle(&arthur);
+            }
+            else if (bios_p1current & CNT_LEFT ) {
 
-                if ( background.position_x > 0 ){
+                arthur.sens = 0;
+
+                if ( arthur.state == ARTHUR_SUR_LE_SOL ){
+
+                    arthur.frames++;
+
+                    if ( background.position_x > 0 ){
+
+                        if ( b2 ){
+                            // Saut vers la gauche
+                            arthur_jump_horizontal(&arthur);
+                        }
+                        else {
+                            // Moves Arthur on left
+                            if ( arthur_walk_left(&arthur) ){
+                                scroll_left();
+                            }
+                        }
+                    }
+                    else {
+                        // --- Arthur fait dur surplace
+                        arthur_walk_left(&arthur);
+                    }
+                }
+            }
+            else if (bios_p1current & CNT_RIGHT && background.position_x < 3260 ) {
+
+                arthur.sens = 1;
+
+                if ( arthur.state == ARTHUR_SUR_LE_SOL ){
+
+                    arthur.frames++;
 
                     if ( b2 ){
-                        // Saut vers la gauche
+                        // Saut vers la droite
                         arthur_jump_horizontal(&arthur);
                     }
                     else {
-                        // Moves Arthur on left
-                        if ( arthur_walk_left(&arthur) ){
-                            scroll_left();
-                        }
-                    }
-                }
-                else {
-                    // --- Arthur fait dur surplace
-                    arthur_walk_left(&arthur);
-                }
-            }
-        }
-        else if (bios_p1current & CNT_RIGHT && background.position_x < 3260 ) {
-
-            arthur.sens = 1;
-
-            if ( arthur.state == ARTHUR_SUR_LE_SOL ){
-
-                arthur.frames++;
-
-                if ( b2 ){
-                    // Saut vers la droite
-                    arthur_jump_horizontal(&arthur);
-                }
-                else {
-                    // Moves Arthur on right            
-                    if ( arthur_walk_right(&arthur) ) {
-                        scroll_right();
-                    }
-                }
-            }
-        }
-        else if ( bios_p1current & CNT_UP ){
-
-            if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
-
-                // --- Arthur peut monter à l'échelle : tile 397
-                if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 || tmx_sol[arthur.tiley][arthur.tilex] == 375 ){
-                    arthur.y++;
-                    arthur.position_y++;
-                    arthur.yf = arthur.y*8;
-                    arthur.state = ARTHUR_SUR_ECHELLE;
-                    arthur.frame_echelle++;
-                    arthur_sur_echelle(&arthur); // --- Display sprite Arthur sur echelle
-                    arthur_calcule_tiles(&arthur);
-                    arthur.frame_echelle_end=0;
-                }
-                else if ( tmx_sol[arthur.tiley][arthur.tilex] == 398 ){
-                    arthur.y++;
-                    arthur.position_y++;
-                    arthur.yf = arthur.y*8;
-                    arthur.state = ARTHUR_SUR_ECHELLE;
-                    arthur.frame_echelle++;
-                    arthur_sur_echelle_last_etape(&arthur); // --- Display last etape from sprite Arthur sur echelle
-                    arthur_calcule_tiles(&arthur);
-                }
-                else {
-                    arthur.state = ARTHUR_SUR_LE_SOL;
-                    arthur.position=ARTHUR_DEBOUT;
-                    arthur_stop_walk(&arthur);
-                    arthur.display_y = -2;
-                    arthur.frame_echelle_end=0;
-                }
-
-                /*
-                arthur.y++;
-                arthur.position_y++;
-                arthur_update(&arthur);
-                */
-            }
-        }
-        else if ( b1 ) {
-            lance_start(lances, arthur.x, arthur.y);
-        }
-        else if ( arthur.state == ARTHUR_SUR_LE_SOL ){
-            // Position neutre de Arthur
-            arthur.position=ARTHUR_DEBOUT;
-            arthur_stop_walk(&arthur);
-        }
-
-        // ---------------------------------------- //
-        // --- Appui sur button A : on tire         //
-        // ---------------------------------------- //
-        if ( b1 ) {
-            lance_start(lances, arthur.x, arthur.y);
-        }
-
-        // ---------------------------------------- //
-        // --- Appui sur button B : on saute        //
-        // ---------------------------------------- //
-        if ( b2 && !l && !r ){
-            arthur_jump_vertical(&arthur);
-        }
-
-        arthur_check_si_dans_le_vide(&arthur);
-
-        // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
-        // fadeInPalette(palettes1, 2);
-
-        if ( arthur.state == ARTHUR_SAUTE_VERTICALEMENT || arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ) {
-            arthur_jump_update(&arthur);
-            if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
-                if ( arthur.sens == 1 ){
-                    if ( arthur.tile_right != 377 && arthur.tile_right != 357 && arthur.tile_right != 358 ){
-                        arthur.position_x++;
-                        scroll_right();
-                    }
-                }
-                else {
-                    if ( arthur.position_x > 144 ){
-                        if ( arthur.tile_left != 377 && arthur.tile_left != 357 && arthur.tile_left != 358 ){
-                            arthur.position_x--;
-                            scroll_left();
+                        // Moves Arthur on right            
+                        if ( arthur_walk_right(&arthur) ) {
+                            scroll_right();
                         }
                     }
                 }
             }
-            // arthur_walk_right(&arthur);
-        }
-        else if ( arthur.state == ARTHUR_TOMBE ) {
-            arthur_tombe_update(&arthur);
+            else if ( bios_p1current & CNT_UP ){
+
+                if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
+
+                    // --- Arthur peut monter à l'échelle : tile 397
+                    if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 || tmx_sol[arthur.tiley][arthur.tilex] == 375 ){
+                        arthur.y++;
+                        arthur.position_y++;
+                        arthur.yf = arthur.y*8;
+                        arthur.state = ARTHUR_SUR_ECHELLE;
+                        arthur.frame_echelle++;
+                        arthur_sur_echelle(&arthur); // --- Display sprite Arthur sur echelle
+                        arthur_calcule_tiles(&arthur);
+                        arthur.frame_echelle_end=0;
+                    }
+                    else if ( tmx_sol[arthur.tiley][arthur.tilex] == 398 ){
+                        arthur.y++;
+                        arthur.position_y++;
+                        arthur.yf = arthur.y*8;
+                        arthur.state = ARTHUR_SUR_ECHELLE;
+                        arthur.frame_echelle++;
+                        arthur_sur_echelle_last_etape(&arthur); // --- Display last etape from sprite Arthur sur echelle
+                        arthur_calcule_tiles(&arthur);
+                    }
+                    else {
+                        arthur.state = ARTHUR_SUR_LE_SOL;
+                        arthur.position=ARTHUR_DEBOUT;
+                        arthur_stop_walk(&arthur);
+                        arthur.display_y = -2;
+                        arthur.frame_echelle_end=0;
+                    }
+
+                    /*
+                    arthur.y++;
+                    arthur.position_y++;
+                    arthur_update(&arthur);
+                    */
+                }
+            }
+            else if ( b1 ) {
+                lance_start(lances, arthur.x, arthur.y);
+            }
+            else if ( arthur.state == ARTHUR_SUR_LE_SOL ){
+                // Position neutre de Arthur
+                arthur.position=ARTHUR_DEBOUT;
+                arthur_stop_walk(&arthur);
+            }
+
+            // ---------------------------------------- //
+            // --- Appui sur button A : on tire         //
+            // ---------------------------------------- //
+            if ( b1 ) {
+                lance_start(lances, arthur.x, arthur.y);
+            }
+
+            // ---------------------------------------- //
+            // --- Appui sur button B : on saute        //
+            // ---------------------------------------- //
+            if ( b2 && !l && !r ){
+                arthur_jump_vertical(&arthur);
+            }
+
+            arthur_check_si_dans_le_vide(&arthur);
+
+            // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
+            // fadeInPalette(palettes1, 2);
+
+            if ( arthur.state == ARTHUR_SAUTE_VERTICALEMENT || arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ) {
+                arthur_jump_update(&arthur);
+                if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
+                    if ( arthur.sens == 1 ){
+                        if ( arthur.tile_right != 377 && arthur.tile_right != 357 && arthur.tile_right != 358 ){
+                            arthur.position_x++;
+                            scroll_right();
+                        }
+                    }
+                    else {
+                        if ( arthur.position_x > 144 ){
+                            if ( arthur.tile_left != 377 && arthur.tile_left != 357 && arthur.tile_left != 358 ){
+                                arthur.position_x--;
+                                scroll_left();
+                            }
+                        }
+                    }
+                }
+                // arthur_walk_right(&arthur);
+            }
+            else if ( arthur.state == ARTHUR_TOMBE ) {
+                arthur_tombe_update(&arthur);
+            }
         }
 
         ng_wait_vblank();

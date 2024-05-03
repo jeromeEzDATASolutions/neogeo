@@ -116,6 +116,20 @@ sprites/lance.c1 sprites/lance.c2: sprites/lance.png
 sprites/lance.pal: sprites/lance.png
 	$(PALTOOL) $< -o $@
 
+# -------------------------------------
+# Map
+# -------------------------------------
+sprites/map.png: gfx/tiles_map.png | sprites
+	$(CONVERT) $^ $^ $^ +append -crop 144x144+0+0 +repage -background black -flatten $@
+
+sprites/map.c1 sprites/map.c2: sprites/map.png
+	$(TILETOOL) --sprite -c $< -o $@ $(@:%.c1=%).c2
+
+sprites/map.pal: sprites/map.png
+	$(PALTOOL) $< -o $@
+
+
+
 $(ELF):	$(OBJS:%=%.o)
 	$(M68KGCC) -o $@ $^ `pkg-config --libs ngdevkit`
 
@@ -130,6 +144,7 @@ main.c: \
 	sprites/arthur2.pal \
 	sprites/nuage.pal \
 	sprites/lance.pal \
+	sprites/map.pal \
 
 # sound driver ROM: ngdevkit's nullsound
 MROMSIZE:=131072
@@ -150,6 +165,7 @@ $(CROM1): $(ASSETS)/rom/c1.bin \
 	sprites/arthur2.c1 \
 	sprites/nuage.c1 \
 	sprites/lance.c1 \
+	sprites/map.c1 \
 	| rom
 	cat $(ASSETS)/rom/c1.bin $(filter %.c1,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 
@@ -161,6 +177,7 @@ $(CROM2): $(ASSETS)/rom/c2.bin \
 	sprites/arthur2.c2 \
 	sprites/nuage.c2 \
 	sprites/lance.c2 \
+	sprites/map.c2 \
 	| rom
 	cat $(ASSETS)/rom/c2.bin $(filter %.c2,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 
