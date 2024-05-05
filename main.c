@@ -365,12 +365,13 @@ int main(void) {
             if ( arthur.position_x == 200 && pont.display == 0 ){
                 // --- Display plateforme PONT
                 pont.display=1;
+                pont.x = 300;
+                pont.level_position_x = 300;
                 pont_init(&pont);
             }
 
             if ( arthur.position_x >= 200 && pont.display == 1 ){
-                pont.x--;
-                pont_update(&pont);
+                pont_move(&pont);
             }
 
             // On checke la position Y de Arthur pour arreter le jeu
@@ -394,7 +395,8 @@ int main(void) {
                 herbe_reset(&herbe, &herbe_origin);
             }
 
-            snprintf(str, 10, "POS %4d", arthur.position_x); ng_text(2, 3, 0, str);
+            snprintf(str, 10, "APX %4d", pont.start_x); ng_text(2, 3, 0, str);
+            snprintf(str, 10, "PPX %4d", pont.level_position_x); ng_text(2, 5, 0, str);
         }
 
         ng_wait_vblank();
@@ -412,6 +414,9 @@ void scroll_left(){
             nuage.height=GNG_NUAGE_TMX_HEIGHT;
             nuage_setup(&nuage);
         }
+        if ( pont.display == 1 ){
+            pont_scroll_left(&pont);
+        }
     }
 }
 
@@ -422,6 +427,10 @@ void scroll_right(){
         if ( background.position_x == 200 ){
             // Hide nuage
             nuage_hide(&nuage);
+        }
+
+        if ( pont.display == 1 ){
+            //pont_scroll_right(&pont);
         }
     }
 }
