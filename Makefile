@@ -128,6 +128,17 @@ sprites/map.c1 sprites/map.c2: sprites/map.png
 sprites/map.pal: sprites/map.png
 	$(PALTOOL) $< -o $@
 
+# -------------------------------------
+# Map
+# -------------------------------------
+sprites/pont.png: gfx/tiles_pont.png | sprites
+	$(CONVERT) $^ $^ $^ +append -crop 32x16+0+0 +repage -background black -flatten $@
+
+sprites/pont.c1 sprites/pont.c2: sprites/pont.png
+	$(TILETOOL) --sprite -c $< -o $@ $(@:%.c1=%).c2
+
+sprites/pont.pal: sprites/pont.png
+	$(PALTOOL) $< -o $@
 
 
 $(ELF):	$(OBJS:%=%.o)
@@ -145,6 +156,7 @@ main.c: \
 	sprites/nuage.pal \
 	sprites/lance.pal \
 	sprites/map.pal \
+	sprites/pont.pal \
 
 # sound driver ROM: ngdevkit's nullsound
 MROMSIZE:=131072
@@ -166,6 +178,7 @@ $(CROM1): $(ASSETS)/rom/c1.bin \
 	sprites/nuage.c1 \
 	sprites/lance.c1 \
 	sprites/map.c1 \
+	sprites/pont.c1 \
 	| rom
 	cat $(ASSETS)/rom/c1.bin $(filter %.c1,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 
@@ -178,6 +191,7 @@ $(CROM2): $(ASSETS)/rom/c2.bin \
 	sprites/nuage.c2 \
 	sprites/lance.c2 \
 	sprites/map.c2 \
+	sprites/pont.c2 \
 	| rom
 	cat $(ASSETS)/rom/c2.bin $(filter %.c2,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 

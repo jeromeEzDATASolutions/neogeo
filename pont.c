@@ -12,135 +12,65 @@ typedef struct _pont_t {
     u16 height;
     s16 x;
     s16 y;
+    s16 level_x;
+    u8 display;
 } pont_t;
 
 pont_t pont = {
     .sprite = CROM_TILE_START_PONT,
     .tile_offset_x = 0, 
-    .tile_offset_y = 4, 
-    .palette = 7, 
-    .width = 3,
-    .height = 2,
-    .x = 100,
-    .y = 100,
+    .tile_offset_y = 0, 
+    .palette = 9, 
+    .width = 2,
+    .height = 1,
+    .x = 280,
+    .y = 12,
+    .level_x = 280, 
+    .display = 0, 
 };
 
 /**
  * Initialisation des lances transmises en parametre via un array de structure
  */
-void pont_init(pont_t p_pont) {
+void pont_init(pont_t *p_pont) {
 
-    for (u16 s=0; s<p_lances[k].width; s++) {
+    for (u16 s=0; s<p_pont->width; s++) {
         *REG_VRAMMOD=1;
-        *REG_VRAMADDR=ADDR_SCB1+((p_lances[k].sprite+s)*64);
-        for (u16 v=0; v<p_lances[k].height; v++) {
-            *REG_VRAMRW = CROM_TILE_OFFSET+arthur.tmx[v+p_lances[k].tile_offset_y][s+p_lances[k].tile_offset_x]-1;
-            *REG_VRAMRW = (p_lances[k].palette<<8);
+        *REG_VRAMADDR=ADDR_SCB1+((p_pont->sprite+s)*64);
+        for (u16 v=0; v<p_pont->height; v++) {
+            *REG_VRAMRW = CROM_TILE_OFFSET+tmx_herbe[v][s]-1;
+            *REG_VRAMRW = (p_pont->palette<<8);
         }
     }
 
     *REG_VRAMMOD=0x200;
-    *REG_VRAMADDR=ADDR_SCB2+p_lances[k].sprite;
+    *REG_VRAMADDR=ADDR_SCB2+p_pont->sprite;
     *REG_VRAMRW=0xFFF;
-    *REG_VRAMRW=(282+p_lances[k].y<<7)+p_lances[k].height;
-    *REG_VRAMRW=(p_lances[k].x<<7);
+    *REG_VRAMRW=(p_pont->y+288<<7)+p_pont->height;
+    *REG_VRAMRW=(p_pont->x<<7);
 
     // --- On chaine l'ensemble des sprites
-    for (u16 v=1; v<p_lances[k].width; v++) {
-        *REG_VRAMADDR=ADDR_SCB2+p_lances[k].sprite+v;
+    for (u16 v=1; v<p_pont->width; v++) {
+        *REG_VRAMADDR=ADDR_SCB2+p_pont->sprite+v;
         *REG_VRAMRW=0xFFF;
         *REG_VRAMRW=1<<6; // sticky
     }
 }
 
-void lance_update(lance_t *p_lance){
+void pont_update(pont_t *p_pont){
 
-    if ( arthur.sens == 0 ) {
-        p_lance->tile_offset_y = 6;
-    }
-    else {
-        p_lance->tile_offset_y = 4;
-    }
-
-    for (u16 s=0; s<p_lance->width; s++) {
+    for (u16 s=0; s<p_pont->width; s++) {
         *REG_VRAMMOD=1;
-        *REG_VRAMADDR=ADDR_SCB1+((p_lance->sprite+s)*64);
-        for (u16 v=0; v<p_lance->height; v++) {
-            *REG_VRAMRW = CROM_TILE_OFFSET+arthur.tmx[v+p_lance->tile_offset_y][s+p_lance->tile_offset_x]-1;
-            *REG_VRAMRW = (p_lance->palette<<8);
+        *REG_VRAMADDR=ADDR_SCB1+((p_pont->sprite+s)*64);
+        for (u16 v=0; v<p_pont->height; v++) {
+            *REG_VRAMRW = CROM_TILE_OFFSET+tmx_herbe[v][s]-1;
+            *REG_VRAMRW = (p_pont->palette<<8);
         }
     }
 
     *REG_VRAMMOD=0x200;
-    *REG_VRAMADDR=ADDR_SCB2+p_lance->sprite;
+    *REG_VRAMADDR=ADDR_SCB2+p_pont->sprite;
     *REG_VRAMRW=0xFFF;
-    *REG_VRAMRW=(282+p_lance->y<<7)+p_lance->height;
-    *REG_VRAMRW=(p_lance->x<<7);
-}
-
-void lance_start(lance_t p_lances[], s16 arthur_x, s16 arthur_y) {
-
-    // --- Arthur tire des lances sauf s'il est sur une échell
-    if ( arthur.state != ARTHUR_SUR_ECHELLE ){
-
-        u8 all_lances_cachees = 1;
-
-        for (u16 s=0; s<3; s++) {
-            if ( lances[s].state != ARTHUR_LANCE_STATE_CACHEE ){
-                all_lances_cachees = 0;
-            }
-        }
-
-        if ( all_lances_cachees == 1 || (lances[arthur.frame_lance].state == ARTHUR_LANCE_STATE_CACHEE && (frames%5)==0)) {
-
-            if ( arthur.sens == 1 ){
-                lances[arthur.frame_lance].x = arthur_x + 20;
-                lances[arthur.frame_lance].y = arthur_y + 18;
-            }
-            else {
-                lances[arthur.frame_lance].x = arthur_x - 20;
-                lances[arthur.frame_lance].y = arthur_y + 18;
-            }
-
-            if ( arthur.position == ARTHUR_ACCROUPI ){
-                lances[arthur.frame_lance].y = arthur_y + 8;
-            }
-
-            lances[arthur.frame_lance].state = ARTHUR_LANCE_STATE_LANCEE;
-            lances[arthur.frame_lance].sens = arthur.sens;
-            lance_update(&lances[arthur.frame_lance]);
-
-            arthur.frame_lance = arthur.frame_lance+1;
-            if ( arthur.frame_lance == 3 ){
-                arthur.frame_lance = 0;
-            }
-        }
-    }
-}
-
-void lances_hide(lance_t p_lances[]){
-    for(u16 i=0; i<3; i++){
-        lances[i].y = 260;
-        lance_update(&lances[i]);
-    }
-}
-
-void lances_gestion(lance_t p_lances[]){
-    for(u16 i=0; i<3; i++){
-        if ( lances[i].state == ARTHUR_LANCE_STATE_LANCEE ){
-
-            if ( lances[i].sens == 1 ){
-                lances[i].x += ARTHUR_LANCE_VITESSE;
-            }
-            else {
-                lances[i].x -= ARTHUR_LANCE_VITESSE;
-            }
-            lance_update(&lances[i]);
-
-            if ( lances[i].x >= 350 || lances[i].x+30 <= 0 ){
-                lances[i].state = ARTHUR_LANCE_STATE_CACHEE;
-                lance_update(&lances[i]);
-            }
-        }
-    }
+    *REG_VRAMRW=(p_pont->y+288<<7)+p_pont->height;
+    *REG_VRAMRW=(p_pont->x<<7);
 }

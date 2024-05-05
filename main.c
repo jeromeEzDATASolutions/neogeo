@@ -69,7 +69,9 @@ extern u8 bios_p1current;
 
 #define DEBUG 1
 #define GAME_SPEED 1
-#define GAME_LEVEL_START 0  // 0 map, 10 level 1, 20 level 2
+#define GAME_LEVEL_START 10  // 0 map, 10 level 1, 20 level 2
+
+#define GNG_START_ARTHUR_POSISTION_X 144
 
 u16 frames;
 int palettes_map[] = {8};
@@ -83,6 +85,7 @@ int palette_background_herbe_nuage[] = {1,2,6};
 #include "arthur.c"
 #include "nuage.c"
 #include "lance.c"
+#include "pont.c"
 #include "map.c" // Intro avant d'afficher le Niveau 1
 
 static void scroll_left();
@@ -181,8 +184,6 @@ int main(void) {
 
             // --- Display sprites Lances
             lances_init(lances);
-            //lance_update(&lances[0]);
-            //snprintf(str, 10, "POS %4d", lances[0].x); ng_text(2, 3, 0, str);
 
             // --- Display nuages
             fadeOutPalette(palette_nuage, 1);
@@ -360,6 +361,17 @@ int main(void) {
                 arthur_tombe_update(&arthur);
             }
 
+            //if ( arthur.position_x >= 1370 ){
+            if ( arthur.position_x == 200 && pont.display == 0 ){
+                // --- Display plateforme PONT
+                pont.display=1;
+                pont_init(&pont);
+            }
+
+            if ( arthur.position_x >= 200 && pont.display == 1 ){
+                pont.x--;
+                pont_update(&pont);
+            }
 
             // On checke la position Y de Arthur pour arreter le jeu
             if ( arthur.y < -30 ){
@@ -382,6 +394,7 @@ int main(void) {
                 herbe_reset(&herbe, &herbe_origin);
             }
 
+            snprintf(str, 10, "POS %4d", arthur.position_x); ng_text(2, 3, 0, str);
         }
 
         ng_wait_vblank();
