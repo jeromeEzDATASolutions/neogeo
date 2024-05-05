@@ -35,11 +35,11 @@ extern u8 bios_p1current;
 #define CROM_TILE_START_NUAGE 1 // 8
 #define CROM_TILE_START_BACKGROUND 9 // 32
 #define CROM_TILE_START_ARTHUR 41 // 2
-#define CROM_TILE_START_HERBE 43 // 32
-#define CROM_TILE_START_LANCE1 75 // 2
-#define CROM_TILE_START_LANCE2 77 // 2
-#define CROM_TILE_START_LANCE3 79 // 2
-#define CROM_TILE_START_PONT 81 // 3
+#define CROM_TILE_START_PONT 43 // 2
+#define CROM_TILE_START_HERBE 45 // 32
+#define CROM_TILE_START_LANCE1 77 // 2
+#define CROM_TILE_START_LANCE2 79 // 2
+#define CROM_TILE_START_LANCE3 81 // 2
 #define CROM_TILE_START_MAP 1 // 32
 
 // --- States for Arthur
@@ -113,6 +113,7 @@ int main(void) {
     // Backup origin structure for reset
     background_save(&background, &background_origin);
     herbe_save(&herbe, &herbe_origin);
+    pont_save(&pont, &pont_origin);
 
     for(;;) {
 
@@ -362,17 +363,16 @@ int main(void) {
             }
 
             //if ( arthur.position_x >= 1370 ){
-            if ( arthur.position_x == 200 && pont.display == 0 ){
+            if ( arthur.position_x == 1484 && pont.display == 0 ){
                 // --- Display plateforme PONT
-                pont.display=1;
-                pont.x = 300;
-                pont.level_position_x = 300;
-                pont_init(&pont);
+                pont_display(&pont);
             }
 
-            if ( arthur.position_x >= 200 && pont.display == 1 ){
-                pont_move(&pont);
+            if ( arthur.position_x < 1370 ){
+                pont_reset_and_hide(&pont);
             }
+
+            pont_move(&pont);
 
             // On checke la position Y de Arthur pour arreter le jeu
             if ( arthur.y < -30 ){
@@ -389,14 +389,15 @@ int main(void) {
                 lances[2].y=260;
                 lances_init(lances);
 
-                // --- Reset Arthur & Background
+                // --- Reset all
                 arthur_reset(&arthur, &arthur_origin);
                 background_reset(&background, &background_origin);
                 herbe_reset(&herbe, &herbe_origin);
+                pont_reset_and_hide(&pont);
             }
 
-            snprintf(str, 10, "APX %4d", pont.start_x); ng_text(2, 3, 0, str);
-            snprintf(str, 10, "PPX %4d", pont.level_position_x); ng_text(2, 5, 0, str);
+            //snprintf(str, 10, "APX %4d", arthur.position_x); ng_text(2, 3, 0, str);
+            //snprintf(str, 10, "PPX %4d", pont.x); ng_text(2, 5, 0, str);
         }
 
         ng_wait_vblank();
@@ -414,9 +415,7 @@ void scroll_left(){
             nuage.height=GNG_NUAGE_TMX_HEIGHT;
             nuage_setup(&nuage);
         }
-        if ( pont.display == 1 ){
-            pont_scroll_left(&pont);
-        }
+        pont_scroll_left(&pont);
     }
 }
 
@@ -428,9 +427,6 @@ void scroll_right(){
             // Hide nuage
             nuage_hide(&nuage);
         }
-
-        if ( pont.display == 1 ){
-            //pont_scroll_right(&pont);
-        }
+        pont_scroll_right(&pont);
     }
 }
