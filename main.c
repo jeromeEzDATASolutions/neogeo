@@ -48,6 +48,7 @@ extern u8 bios_p1current;
 #define ARTHUR_SAUTE_VERTICALEMENT 2
 #define ARTHUR_SAUTE_HORIZONTALEMENT 3
 #define ARTHUR_TOMBE 4
+#define ARTHUR_SUR_PLATEFORME 5
 
 // --- Positions for Arthur
 #define ARTHUR_DEBOUT 0
@@ -82,10 +83,10 @@ int palette_background_herbe_nuage[] = {1,2,6};
 // Plane and scrolling state
 #include "palette.c"
 #include "background.c"
+#include "pont.c"
 #include "arthur.c"
 #include "nuage.c"
 #include "lance.c"
-#include "pont.c"
 #include "map.c" // Intro avant d'afficher le Niveau 1
 
 static void scroll_left();
@@ -228,7 +229,7 @@ int main(void) {
 
                 arthur.sens = 0;
 
-                if ( arthur.state == ARTHUR_SUR_LE_SOL ){
+                if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_PLATEFORME){
 
                     arthur.frames++;
 
@@ -255,7 +256,7 @@ int main(void) {
 
                 arthur.sens = 1;
 
-                if ( arthur.state == ARTHUR_SUR_LE_SOL ){
+                if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_PLATEFORME){
 
                     arthur.frames++;
 
@@ -339,7 +340,7 @@ int main(void) {
             // fadeInPalette(palettes1, 2);
 
             if ( arthur.state == ARTHUR_SAUTE_VERTICALEMENT || arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ) {
-                arthur_jump_update(&arthur);
+                arthur_jump_update(&arthur, &pont);
                 if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
                     if ( arthur.sens == 1 ){
                         if ( arthur.tile_right != 377 && arthur.tile_right != 357 && arthur.tile_right != 358 ){
@@ -362,17 +363,30 @@ int main(void) {
                 arthur_tombe_update(&arthur);
             }
 
-            //if ( arthur.position_x >= 1370 ){
-            if ( arthur.position_x == 1484 && pont.display == 0 ){
+            //if ( arthur.position_x == 1484 && pont.display == 0 ){
+            if ( arthur.position_x == 156 && pont.display == 0 ){
                 // --- Display plateforme PONT
                 pont_display(&pont);
             }
 
             if ( arthur.position_x < 1370 ){
-                pont_reset_and_hide(&pont);
+                //pont_reset_and_hide(&pont);
             }
 
             pont_move(&pont);
+
+            if ( arthur.state == ARTHUR_SUR_PLATEFORME ){
+                // Arthur est sur une plateforme, il est donc porté par la plateforme
+                arthur_stop_walk(&arthur);
+                if ( pont.sens == 1 ){
+                    arthur.position_x++;
+                    scroll_right();
+                }
+                else if ( pont.sens == 0 ){
+                    arthur.position_x--;
+                    scroll_left();
+                }
+            }
 
             // On checke la position Y de Arthur pour arreter le jeu
             if ( arthur.y < -30 ){
@@ -396,8 +410,8 @@ int main(void) {
                 pont_reset_and_hide(&pont);
             }
 
-            //snprintf(str, 10, "APX %4d", arthur.position_x); ng_text(2, 3, 0, str);
-            //snprintf(str, 10, "PPX %4d", pont.x); ng_text(2, 5, 0, str);
+            snprintf(str, 10, "APX %4d", arthur.x); ng_text(2, 3, 0, str);
+            snprintf(str, 10, "PPX %4d", pont.x); ng_text(2, 5, 0, str);
         }
 
         ng_wait_vblank();

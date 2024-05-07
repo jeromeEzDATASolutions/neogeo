@@ -129,7 +129,7 @@ sprites/map.pal: sprites/map.png
 	$(PALTOOL) $< -o $@
 
 # -------------------------------------
-# Map
+# Pont
 # -------------------------------------
 sprites/pont.png: gfx/tiles_pont.png | sprites
 	$(CONVERT) $^ $^ $^ +append -crop 32x16+0+0 +repage -background black -flatten $@

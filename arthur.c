@@ -218,7 +218,7 @@ int arthur_walk_left(arthur_t *arthur){
         arthur->tile_offset_x=0;
     }
 
-    if ( arthur->state == ARTHUR_SUR_LE_SOL && ( arthur->frames == 4 || arthur->tile_offset_x == 0 )) {
+    if ( ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ) && ( arthur->frames == 4 || arthur->tile_offset_x == 0 )) {
         arthur->frames = 0;
         arthur->tile_offset_x+=2;
         if ( arthur->tile_offset_x == 18 ){
@@ -232,7 +232,11 @@ int arthur_walk_left(arthur_t *arthur){
 
     // fadeInPalette(palette_background_herbe_nuage, 3);
 
-    if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
+    if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
+        arthur->position_x--;
+        return 1;
+    }
+    else if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
 
         if ( arthur->tile_left == 377 || arthur->tile_left == 357 || arthur->tile_left == 358 ) {
         }
@@ -261,7 +265,7 @@ int arthur_walk_right(arthur_t *arthur){
         arthur->tile_offset_x=0;
     }
 
-    if ( arthur->state == ARTHUR_SUR_LE_SOL && ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) ) {
+    if ( ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ) && ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) ) {
         arthur->frames = 0;
         arthur->tile_offset_x+=2;
         if ( arthur->tile_offset_x == 18 ){
@@ -277,9 +281,15 @@ int arthur_walk_right(arthur_t *arthur){
         //snprintf(str, 30, "ATB %3d", arthur->tile_right); ng_text(2, 3, 0, str);
     }
 
-    // Arthur ne peut marcher que sur le sol : tile 401
-    if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
+    if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
+        // --- On doit checker si Arthur est toujours sur la plateforme
+        
+        arthur->position_x++;
+        return 1;
+    }
+    else if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
 
+        // Arthur ne peut marcher que sur le sol : tile 401
         if ( arthur->tile_right == 377 || arthur->tile_right == 357 || arthur->tile_right == 358 ) {
 
         }
@@ -458,7 +468,9 @@ void arthur_jump_horizontal(arthur_t *arthur){
     }
 }
 
-void arthur_jump_update(arthur_t *arthur){
+void arthur_jump_update(arthur_t *arthur, pont_t *pont){
+
+    char str[10];
 
     // --- On affiche la tile pour le saut vertical
     if ( arthur->state == ARTHUR_SAUTE_VERTICALEMENT ){
@@ -503,6 +515,19 @@ void arthur_jump_update(arthur_t *arthur){
             arthur->y = (15-(arthur->tiley+1))*16;
             arthur->position_y = (15-(arthur->tiley+1))*16;
             arthur->yf = arthur->y*8;
+        }
+
+        if ( pont->display == 1 ){
+            if ( arthur->x >= pont->x && arthur->x <= (pont->x)+32 ){
+                snprintf(str, 10, "PT DESSOUS"); ng_text(2, 7, 0, str);
+                arthur->velocity = 35; // 35
+                arthur->state = ARTHUR_SUR_PLATEFORME;
+                arthur->saut_up = 0;
+                arthur->saut_down = 0;
+                arthur->y = pont->y+16;
+                arthur->position_y = pont->y+16;
+                arthur->yf = arthur->y*8;
+            }
         }
 
         arthur_update(arthur);

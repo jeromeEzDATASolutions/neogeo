@@ -29,8 +29,8 @@ pont_t pont = {
     .height = 1,
     .x = 300,
     .y = 12,
-    .start_x = 212, 
-    .end_x = 325, 
+    .start_x = 212, // 212
+    .end_x = 325, // 325
     .display = 0, 
     .sens = 0, // Gauche par défaut
 };
