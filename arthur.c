@@ -233,8 +233,16 @@ int arthur_walk_left(arthur_t *arthur){
     // fadeInPalette(palette_background_herbe_nuage, 3);
 
     if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
-        arthur->position_x--;
-        return 1;
+        // --- On doit checker si Arthur est toujours sur la plateforme
+        if ( arthur->x>=pont.x-12 ){
+            arthur->position_x--;
+            return 1;
+        }
+        else {
+            // Il tombe
+            arthur->state = ARTHUR_TOMBE;
+            arthur_tombe_update(&arthur);
+        }
     }
     else if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
 
@@ -282,10 +290,15 @@ int arthur_walk_right(arthur_t *arthur){
     }
 
     if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
-        // --- On doit checker si Arthur est toujours sur la plateforme
-        
-        arthur->position_x++;
-        return 1;
+        if ( arthur->x<=pont.x+16 ){
+            arthur->position_x++;
+            return 1;
+        }
+        else {
+            // Il tombe
+            arthur->state = ARTHUR_TOMBE;
+            arthur_tombe_update(&arthur);
+        }
     }
     else if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
 
