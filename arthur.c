@@ -33,6 +33,8 @@ static void arthur_tombe();
 static void arthur_sur_echelle_last_etape();
 static void arthur_sur_echelle();
 static void arthur_tombe_update();
+static void arthur_update_posision_x_left();
+static void arthur_update_posision_x_right();
 
 typedef struct _arthur_t {
     u16 sprite;
@@ -63,6 +65,8 @@ typedef struct _arthur_t {
     u16 frame_echelle;
     u16 frame_echelle_end;
     u16 frame_lance;
+    u16 absolute_bottom_left_x;
+    u16 absolute_bottom_right_x;
 } arthur_t;
 
 arthur_t arthur = {
@@ -93,6 +97,8 @@ arthur_t arthur = {
     .frame_echelle = 0, 
     .frame_echelle_end = 0, 
     .frame_lance = 0, 
+    .absolute_bottom_left_x = GNG_START_ARTHUR_POSISTION_X, 
+    .absolute_bottom_right_x = GNG_START_ARTHUR_POSISTION_X + (2*16), 
 };
 
 arthur_t arthur_origin = {
@@ -123,6 +129,8 @@ arthur_t arthur_origin = {
     .frame_echelle = 0, 
     .frame_echelle_end = 0, 
     .frame_lance = 0, 
+    .absolute_bottom_left_x = GNG_START_ARTHUR_POSISTION_X, 
+    .absolute_bottom_right_x = GNG_START_ARTHUR_POSISTION_X + (2*16), 
 };
 
 void arthur_reset(arthur_t *arthur, arthur_t *arthur_origin){
@@ -152,6 +160,8 @@ void arthur_reset(arthur_t *arthur, arthur_t *arthur_origin){
     arthur->frame_echelle = arthur_origin->frame_echelle;
     arthur->frame_echelle_end = arthur_origin->frame_echelle_end;
     arthur->frame_lance = arthur_origin->frame_lance;
+    arthur->absolute_bottom_left_x = arthur_origin->absolute_bottom_left_x;
+    arthur->absolute_bottom_right_x = arthur_origin->absolute_bottom_right_x;
 }
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -236,7 +246,7 @@ int arthur_walk_left(arthur_t *arthur){
     if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
         // --- On doit checker si Arthur est toujours sur la plateforme
         if ( arthur->x>=pont.x-12 ){
-            arthur->position_x--;
+            arthur_update_posision_x_left(arthur);
             return 1;
         }
         else {
@@ -252,7 +262,7 @@ int arthur_walk_left(arthur_t *arthur){
         else {
             arthur->position=ARTHUR_DEBOUT;
             if ( arthur->position_x > 144 ){
-                arthur->position_x--;
+                arthur_update_posision_x_left(arthur);
             }
             return 1;
         }
@@ -274,7 +284,7 @@ int arthur_walk_right(arthur_t *arthur){
         arthur->tile_offset_x=0;
     }
 
-    if ( ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ) ) {
+    if ( ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ) && ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) ) {
         arthur->frames = 0;
         arthur->tile_offset_x+=2;
         if ( arthur->tile_offset_x == 18 ){
@@ -292,7 +302,7 @@ int arthur_walk_right(arthur_t *arthur){
 
     if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
         if ( arthur->x<=pont.x+16 ){
-            arthur->position_x++;
+            arthur_update_posision_x_right(arthur);
             return 1;
         }
         else {
@@ -310,7 +320,7 @@ int arthur_walk_right(arthur_t *arthur){
         else {
             // Arthur peut marcher à droite
             arthur->position=ARTHUR_DEBOUT;
-            arthur->position_x++;
+            arthur_update_posision_x_right(arthur);
 
             // jump(arthur);
             // update(arthur);
@@ -327,6 +337,18 @@ int arthur_walk_right(arthur_t *arthur){
     }
 
     return 0;
+}
+
+void arthur_update_posision_x_left(arthur_t *arthur){
+    arthur->position_x--;
+    arthur->absolute_bottom_left_x--;
+    arthur->absolute_bottom_right_x--;
+}
+
+void arthur_update_posision_x_right(arthur_t *arthur){
+    arthur->position_x++;
+    arthur->absolute_bottom_left_x++;
+    arthur->absolute_bottom_right_x++;
 }
 
 void arthur_stop_walk(arthur_t *arthur){
@@ -552,7 +574,7 @@ void arthur_calcule_tiles(arthur_t *arthur){
     u16 arthur_sprite_x_left = arthur->position_x;
     u16 arthur_sprite_x_right = arthur->position_x+27;
 
-    arthur->tilex = ((arthur->position_x)>>4)+1;
+    arthur->tilex = ((arthur->position_x-3)>>4)+1;
     arthur->tiley = 15-((arthur->position_y>>4)+1);
 
     // --- On determine la tile à droite d'Arthur

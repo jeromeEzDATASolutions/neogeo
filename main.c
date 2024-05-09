@@ -344,14 +344,14 @@ int main(void) {
                 if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
                     if ( arthur.sens == 1 ){
                         if ( arthur.tile_right != 377 && arthur.tile_right != 357 && arthur.tile_right != 358 ){
-                            arthur.position_x++;
+                            arthur_update_posision_x_right(&arthur);
                             scroll_right();
                         }
                     }
                     else {
                         if ( arthur.position_x > 144 ){
                             if ( arthur.tile_left != 377 && arthur.tile_left != 357 && arthur.tile_left != 358 ){
-                                arthur.position_x--;
+                                arthur_update_posision_x_left(&arthur);
                                 scroll_left();
                             }
                         }
@@ -406,13 +406,15 @@ int main(void) {
 
             if ( arthur.state == ARTHUR_SUR_PLATEFORME ){
                 // Arthur est sur une plateforme, il est donc porté par la plateforme
-                arthur_stop_walk(&arthur);
+                if ( !l && !r ){
+                    arthur_stop_walk(&arthur);
+                }
                 if ( pont.sens == 1 ){
-                    arthur.position_x++;
+                    arthur_update_posision_x_right(&arthur);
                     scroll_right();
                 }
                 else if ( pont.sens == 0 ){
-                    arthur.position_x--;
+                    arthur_update_posision_x_left(&arthur);
                     scroll_left();
                 }
             }
@@ -441,7 +443,8 @@ int main(void) {
                 nuage.y = 140;
             }
 
-            snprintf(str, 10, "APX %4d", arthur.position_x); ng_text(2, 3, 0, str);
+            snprintf(str, 20, "ABL %4d", arthur.absolute_bottom_left_x); ng_text(2, 3, 0, str);
+            snprintf(str, 20, "ABR %4d", arthur.absolute_bottom_right_x); ng_text(2, 5, 0, str);
         }
 
         ng_wait_vblank();
