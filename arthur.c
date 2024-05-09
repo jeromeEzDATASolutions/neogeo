@@ -32,6 +32,7 @@ static void arthur_calcule_tiles();
 static void arthur_tombe();
 static void arthur_sur_echelle_last_etape();
 static void arthur_sur_echelle();
+static void arthur_tombe_update();
 
 typedef struct _arthur_t {
     u16 sprite;
@@ -468,14 +469,14 @@ void arthur_check_si_dans_le_vide(arthur_t *arthur){
 }
 
 void arthur_jump_vertical(arthur_t *arthur){
-    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+    if ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ){
         arthur->state = ARTHUR_SAUTE_VERTICALEMENT;
         arthur->velocity = 35; // 35
     }
 }
 
 void arthur_jump_horizontal(arthur_t *arthur){
-    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+    if ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ){
         arthur->state = ARTHUR_SAUTE_HORIZONTALEMENT;
         arthur->velocity = 35; // 35
     }
@@ -531,8 +532,7 @@ void arthur_jump_update(arthur_t *arthur, pont_t *pont){
         }
 
         if ( pont->display == 1 ){
-            if ( arthur->x >= pont->x && arthur->x <= (pont->x)+32 ){
-                snprintf(str, 10, "PT DESSOUS"); ng_text(2, 7, 0, str);
+            if ( arthur->y < 32 && arthur->x >= pont->x && arthur->x <= (pont->x)+32 ){
                 arthur->velocity = 35; // 35
                 arthur->state = ARTHUR_SUR_PLATEFORME;
                 arthur->saut_up = 0;
@@ -544,8 +544,6 @@ void arthur_jump_update(arthur_t *arthur, pont_t *pont){
         }
 
         arthur_update(arthur);
-
-        //for ( u16 i=0; i<3000; i++){}
     }
 }
 

@@ -76,7 +76,7 @@ extern u8 bios_p1current;
 
 u16 frames;
 int palettes_map[] = {8};
-int palettes_background_herbe[] = {1,2};
+int palettes_background_herbe_eau_nuage[] = {1,2,3,6};
 int palette_nuage[] = {6};
 int palette_background_herbe_nuage[] = {1,2,6};
 
@@ -164,7 +164,7 @@ int main(void) {
             //setPaletteToBlack(palette_nuage, 1);
 
             // --- Set palette 1 and 2 to black
-            setPaletteToBlack(palettes_background_herbe, 2);
+            setPaletteToBlack(palettes_background_herbe_eau_nuage, 4);
 
             // --- Load tmx from background
             init_plane_tmx_background(&background);
@@ -187,11 +187,11 @@ int main(void) {
             // --- Display sprites Lances
             lances_init(lances);
 
+            // --- Display background
+            fadeOutPalette(palettes_background_herbe_eau_nuage, 4);
+
             // --- Display nuages
             fadeOutPalette(palette_nuage, 1);
-
-            // --- Display background
-            fadeOutPalette(palettes_background_herbe, 2);
 
             gng_niveau = 11;
         }
@@ -363,16 +363,45 @@ int main(void) {
                 arthur_tombe_update(&arthur);
             }
 
-            //if ( arthur.position_x == 1484 && pont.display == 0 ){
+            // ------------------------------------------
+            // Premier PONT
+            // ------------------------------------------
             if ( arthur.position_x == 156 && pont.display == 0 ){
-                // --- Display plateforme PONT
                 pont_display(&pont);
             }
-
-            if ( arthur.position_x < 1370 ){
-                //pont_reset_and_hide(&pont);
+            if ( arthur.sens == 1 && arthur.position_x == 530 ){
+                pont_reset_and_hide(&pont);
+            }
+            else if ( arthur.sens == 0 && arthur.position_x == 410 ){
+                if ( pont.display == 0 ){
+                    pont.x=-30;
+                    pont.sens=1;
+                    pont.start_x=-44;
+                    pont.end_x=74;
+                    pont_display_left(&pont);
+                }
             }
 
+            // ------------------------------------------
+            // Deuxieme PONT
+            // ------------------------------------------
+            if ( arthur.position_x == 1484 && pont.display == 0 ){
+                pont_display(&pont);
+            }
+            if ( arthur.sens == 1 && arthur.position_x == 1858 ){
+                pont_reset_and_hide(&pont);
+            }
+            else if ( arthur.sens == 0 && arthur.position_x == 1738 ){
+                pont.x=-30;
+                pont.sens=1;
+                pont.start_x=-44;
+                pont.end_x=74;
+                pont_display_left(&pont);
+            }
+
+            // ------------------------------------------
+            // Gestion du PONT
+            // ------------------------------------------
             pont_move(&pont);
 
             if ( arthur.state == ARTHUR_SUR_PLATEFORME ){
@@ -408,10 +437,11 @@ int main(void) {
                 background_reset(&background, &background_origin);
                 herbe_reset(&herbe, &herbe_origin);
                 pont_reset_and_hide(&pont);
+                nuage.x = 60;
+                nuage.y = 140;
             }
 
-            snprintf(str, 10, "APX %4d", arthur.x); ng_text(2, 3, 0, str);
-            snprintf(str, 10, "PPX %4d", pont.x); ng_text(2, 5, 0, str);
+            snprintf(str, 10, "APX %4d", arthur.position_x); ng_text(2, 3, 0, str);
         }
 
         ng_wait_vblank();

@@ -147,6 +147,13 @@ void pont_display(pont_t *p_pont){
     pont_init(&pont);
 }
 
+void pont_display_left(pont_t *p_pont){
+    p_pont->display=1;
+    p_pont->height = pont_origin.height;
+    pont_init(&pont);
+}
+
+
 void pont_reset_and_hide(pont_t *p_pont){
     p_pont->display = 0;
     p_pont->height = 0;

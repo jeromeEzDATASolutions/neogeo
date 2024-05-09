@@ -24,7 +24,10 @@ $(CART): $(PROM) $(CROM1) $(CROM2) $(SROM) $(VROM) $(MROM) | rom
 
 OBJS=main
 ELF=rom.elf
+
 FIX_ASSETS=$(ASSETS)/rom/s1-shadow.bin
+
+
 
 $(ASSETS)/rom/c1.bin $(ASSETS)/rom/s1.bin:
 	$(MAKE) -C $(ASSETS)
@@ -139,6 +142,20 @@ sprites/pont.c1 sprites/pont.c2: sprites/pont.png
 
 sprites/pont.pal: sprites/pont.png
 	$(PALTOOL) $< -o $@
+
+# -------------------------------------
+# Fix layer Arme
+# -------------------------------------
+sprites/fix.png: gfx/fix_arme.png | sprites
+	$(CONVERT) $^ $^ $^ +append -crop 320x240+0+0 +repage -background black -flatten $@
+
+sprites/fix.c1 sprites/fix.c2: sprites/fix.png
+	$(TILETOOL) --sprite -c $< -o $@ $(@:%.c1=%).c2
+
+sprites/fix.pal: sprites/fix.png
+	$(PALTOOL) $< -o $@
+
+
 
 
 $(ELF):	$(OBJS:%=%.o)
