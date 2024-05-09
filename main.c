@@ -369,10 +369,10 @@ int main(void) {
             if ( arthur.position_x == 156 && pont.display == 0 ){
                 pont_display(&pont);
             }
-            if ( arthur.sens == 1 && arthur.position_x == 530 ){
+            if ( arthur.sens == 1 && arthur.position_x == (156+374) ){
                 pont_reset_and_hide(&pont);
             }
-            else if ( arthur.sens == 0 && arthur.position_x == 410 ){
+            else if ( arthur.sens == 0 && arthur.position_x == (156+254) ){
                 if ( pont.display == 0 ){
                     pont.x=-30;
                     pont.sens=1;
@@ -388,10 +388,10 @@ int main(void) {
             if ( arthur.position_x == 1484 && pont.display == 0 ){
                 pont_display(&pont);
             }
-            if ( arthur.sens == 1 && arthur.position_x == 1858 ){
+            if ( arthur.sens == 1 && arthur.position_x == (1484+374) ){
                 pont_reset_and_hide(&pont);
             }
-            else if ( arthur.sens == 0 && arthur.position_x == 1738 ){
+            else if ( arthur.sens == 0 && arthur.position_x == (1484+254) ){
                 pont.x=-30;
                 pont.sens=1;
                 pont.start_x=-44;
