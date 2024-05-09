@@ -35,6 +35,7 @@ static void arthur_sur_echelle();
 static void arthur_tombe_update();
 static void arthur_update_posision_x_left();
 static void arthur_update_posision_x_right();
+static int arthur_can_go_to_right();
 
 typedef struct _arthur_t {
     u16 sprite;
@@ -238,6 +239,21 @@ int arthur_walk_left(arthur_t *arthur){
         arthur_update(arthur);
     }
 
+    // --- On checke si Arthur peut aller à droite
+    u8 tmp_choix_arthur = arthur_can_go_to_left(arthur);
+    if ( tmp_choix_arthur == 1 ){
+        // Arthur peut marcher à droite
+        arthur->position=ARTHUR_DEBOUT;
+        arthur_update_posision_x_left(arthur);
+        return 1;
+    }
+    else if ( tmp_choix_arthur == 2 ){
+        snprintf(str, 20, "TOMBE %4d", arthur->state); ng_text(2, 9, 0, str);
+        arthur_tombe(arthur);
+        return 0;
+    }
+    
+    /*
     // --- On determine la tile sur laquelle est Arthur
     arthur_calcule_tiles(arthur);
 
@@ -270,6 +286,7 @@ int arthur_walk_left(arthur_t *arthur){
     else {
         arthur_tombe(arthur);
     }
+    */
 
     return 0;
 }
@@ -284,6 +301,7 @@ int arthur_walk_right(arthur_t *arthur){
         arthur->tile_offset_x=0;
     }
 
+    // --- Animation d'Arthur qui marche à droite
     if ( ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ) && ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) ) {
         arthur->frames = 0;
         arthur->tile_offset_x+=2;
@@ -293,11 +311,22 @@ int arthur_walk_right(arthur_t *arthur){
         arthur_update(arthur);
     }
 
-    // --- On determine la tile sur laquelle est Arthur
-    arthur_calcule_tiles(arthur);
+    // --- On checke si Arthur peut aller à droite
+    u8 tmp_choix_arthur = arthur_can_go_to_right(arthur);
+    if ( tmp_choix_arthur == 1 ){
+        // Arthur peut marcher à droite
+        arthur->position=ARTHUR_DEBOUT;
+        arthur_update_posision_x_right(arthur);
+        return 1;
+    }
+    else if ( tmp_choix_arthur == 2 ){
+        snprintf(str, 20, "TOMBE %4d", arthur->state); ng_text(2, 9, 0, str);
+        arthur_tombe(arthur);
+        return 0;
+    }
 
+    /*
     if ( arthur->state == ARTHUR_SUR_ECHELLE ){
-        //snprintf(str, 30, "ATB %3d", arthur->tile_right); ng_text(2, 3, 0, str);
     }
 
     if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
@@ -312,29 +341,19 @@ int arthur_walk_right(arthur_t *arthur){
         }
     }
     else if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
-
         // Arthur ne peut marcher que sur le sol : tile 401
         if ( arthur->tile_right == 377 || arthur->tile_right == 357 || arthur->tile_right == 358 ) {
-
         }
         else {
             // Arthur peut marcher à droite
             arthur->position=ARTHUR_DEBOUT;
-            arthur_update_posision_x_right(arthur);
-
-            // jump(arthur);
-            // update(arthur);
-
-            // snprintf(str, 30, "Coor X-Y %3d", FIXED_TO_INT(arthur->y)); ng_text(2, 5, 0, str);
-
-            // Ensuite on fait un fondu pour tout faire disparaitre
-            // fadeInPalette(palette_background_herbe_nuage, 3);
             return 1;
         }
     }
     else {
-        arthur_tombe(arthur);
+        //arthur_tombe(arthur);
     }
+    */
 
     return 0;
 }
@@ -569,16 +588,54 @@ void arthur_jump_update(arthur_t *arthur, pont_t *pont){
     }
 }
 
+int arthur_can_go_to_left(arthur_t *arthur){
+
+    char str[10];
+    arthur->tiley = 15-((arthur->position_y>>4)+1);
+    u16 tile = tmx_sol[arthur->tiley+1][(arthur->absolute_bottom_right_x-10)>>4];
+
+    if ( arthur->sens == 0 ){
+        if ( tile == 375 || tile == 357 ){
+            return 1; 
+        }
+        else if ( tile == 0 ){
+            return 2;
+        }
+    }
+
+    return 0; 
+}
+
+int arthur_can_go_to_right(arthur_t *arthur){
+
+    char str[10];
+    arthur->tiley = 15-((arthur->position_y>>4)+1);
+    u16 tile = tmx_sol[arthur->tiley+1][(arthur->absolute_bottom_left_x+10)>>4];
+
+    if ( arthur->sens == 1 ){
+        if ( tile == 375 || tile == 357 ){
+            return 1; 
+        }
+        else if ( tile == 0 ){
+            return 2;
+        }
+    }
+
+    return 0; 
+}
+
 void arthur_calcule_tiles(arthur_t *arthur){
+
+    char str[10];
 
     u16 arthur_sprite_x_left = arthur->position_x;
     u16 arthur_sprite_x_right = arthur->position_x+27;
 
-    arthur->tilex = ((arthur->position_x-3)>>4)+1;
+    arthur->tilex = ((arthur->absolute_bottom_left_x)>>4);
     arthur->tiley = 15-((arthur->position_y>>4)+1);
 
     // --- On determine la tile à droite d'Arthur
-    arthur->tile_right = tmx_sol[arthur->tiley][arthur_sprite_x_right>>4];
+    arthur->tile_right = tmx_sol[arthur->tiley][(arthur->absolute_bottom_left_x+32)>>4];
 
     // --- On determine la tile à gauche d'Arthur
     arthur->tile_left = tmx_sol[arthur->tiley][(arthur_sprite_x_left+4)>>4];
@@ -594,8 +651,12 @@ void arthur_tombe(arthur_t *arthur){
 }
 
 void arthur_tombe_update(arthur_t *arthur){
+
+    char str[10];
+    snprintf(str, 20, "STATE %4d", arthur->state); ng_text(2, 7, 0, str);
+
     if ( arthur->state == ARTHUR_TOMBE ){
-        if ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 377 || arthur->tile_bottom == 378 || arthur->tile_bottom == 357 || arthur->tile_bottom == 80 ) {
+        if ( 1==2 && (arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 377 || arthur->tile_bottom == 378 || arthur->tile_bottom == 357 || arthur->tile_bottom == 80 )) {
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->y = (15-(arthur->tiley+1))*16;
             arthur->position_y = (15-(arthur->tiley+1))*16;
