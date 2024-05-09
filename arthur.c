@@ -274,7 +274,7 @@ int arthur_walk_right(arthur_t *arthur){
         arthur->tile_offset_x=0;
     }
 
-    if ( ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ) && ( arthur->frames == 4 || arthur->tile_offset_x == 0 ) ) {
+    if ( ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ) ) {
         arthur->frames = 0;
         arthur->tile_offset_x+=2;
         if ( arthur->tile_offset_x == 18 ){
