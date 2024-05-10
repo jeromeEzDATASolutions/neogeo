@@ -80,6 +80,9 @@ int palettes_background_herbe_eau_nuage[] = {1,2,3,6};
 int palette_nuage[] = {6};
 int palette_background_herbe_nuage[] = {1,2,6};
 
+static void scroll_left();
+static void scroll_right();
+
 // Plane and scrolling state
 #include "palette.c"
 #include "background.c"
@@ -88,9 +91,6 @@ int palette_background_herbe_nuage[] = {1,2,6};
 #include "nuage.c"
 #include "lance.c"
 #include "map.c" // Intro avant d'afficher le Niveau 1
-
-static void scroll_left();
-static void scroll_right();
 
 u16 gng_niveau = GAME_LEVEL_START;
 
@@ -198,6 +198,9 @@ int main(void) {
 
         if ( gng_niveau == 11 ){
 
+            //snprintf(str, 10, "ArX %4d", arthur.x); ng_text(2, 3, 0, str);
+            //snprintf(str, 10, "PtX %4d", pont.x); ng_text(2, 5, 0, str);
+
             frames++;
 
             if ( frames == 1000 ){
@@ -233,7 +236,13 @@ int main(void) {
 
                     arthur.frames++;
 
-                    if ( background.position_x > 0 ){
+                    if ( b2 ){
+                        // Saut vers la gauche
+                        arthur_jump_horizontal(&arthur);
+                    }
+                    else arthur_walk_left(&arthur);
+
+                    /*if ( background.position_x > 0 ){
 
                         if ( b2 ){
                             // Saut vers la gauche
@@ -247,9 +256,9 @@ int main(void) {
                         }
                     }
                     else {
-                        // --- Arthur fait dur surplace
+                        // --- Arthur fait du surplace
                         arthur_walk_left(&arthur);
-                    }
+                    }*/
                 }
             }
             else if (bios_p1current & CNT_RIGHT && background.position_x < 3260 ) {
@@ -264,12 +273,7 @@ int main(void) {
                         // Saut vers la droite
                         arthur_jump_horizontal(&arthur);
                     }
-                    else {
-                        // Moves Arthur on right            
-                        if ( arthur_walk_right(&arthur) ) {
-                            scroll_right();
-                        }
-                    }
+                    else arthur_walk_right(&arthur);
                 }
             }
             else if ( bios_p1current & CNT_UP ){
@@ -343,10 +347,10 @@ int main(void) {
                 arthur_jump_update(&arthur, &pont);
                 if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
                     if ( arthur.sens == 1 ){
-                        if ( arthur.tile_right != 377 && arthur.tile_right != 357 && arthur.tile_right != 358 ){
+                        //if ( arthur.tile_right != 377 && arthur.tile_right != 357 && arthur.tile_right != 358 ){
                             arthur_update_posision_x_right(&arthur);
                             scroll_right();
-                        }
+                        //}
                     }
                     else {
                         if ( arthur.position_x > 144 ){
@@ -442,9 +446,6 @@ int main(void) {
                 nuage.x = 60;
                 nuage.y = 140;
             }
-
-            snprintf(str, 20, "ABL %4d", arthur.absolute_bottom_left_x); ng_text(2, 3, 0, str);
-            snprintf(str, 20, "ABR %4d", arthur.absolute_bottom_right_x); ng_text(2, 5, 0, str);
         }
 
         ng_wait_vblank();
