@@ -69,6 +69,8 @@ typedef struct _arthur_t {
     u16 frame_lance;
     u16 absolute_bottom_left_x;
     u16 absolute_bottom_right_x;
+    u16 tile_bottom_left;
+    u16 tile_bottom_right;
 } arthur_t;
 
 arthur_t arthur = {
@@ -101,6 +103,8 @@ arthur_t arthur = {
     .frame_lance = 0, 
     .absolute_bottom_left_x = GNG_START_ARTHUR_POSISTION_X, 
     .absolute_bottom_right_x = GNG_START_ARTHUR_POSISTION_X + (2*16), 
+    .tile_bottom_left = 0, 
+    .tile_bottom_right = 0,
 };
 
 arthur_t arthur_origin = {
@@ -133,6 +137,8 @@ arthur_t arthur_origin = {
     .frame_lance = 0, 
     .absolute_bottom_left_x = GNG_START_ARTHUR_POSISTION_X, 
     .absolute_bottom_right_x = GNG_START_ARTHUR_POSISTION_X + (2*16), 
+    .tile_bottom_left = 0,
+    .tile_bottom_right = 0,
 };
 
 void arthur_reset(arthur_t *arthur, arthur_t *arthur_origin){
@@ -510,15 +516,42 @@ void arthur_jump_update(arthur_t *arthur, pont_t *pont){
         // --- On determine la tile sur laquelle est Arthur
         arthur_calcule_tiles(arthur);
 
+
+
         // --- arthur->y == 31
-        if ( arthur->saut_down && ( arthur->tile_bottom == 267 || arthur->tile_bottom == 375 || arthur->tile_bottom == 377 || arthur->tile_bottom == 378 || arthur->tile_bottom == 357 || arthur->tile_bottom == 80 || arthur->tile_bottom == TILE_ECHELLE_END ) ){
-            arthur->velocity = 35; // 35
-            arthur->state = ARTHUR_SUR_LE_SOL;
-            arthur->saut_up = 0;
-            arthur->saut_down = 0;
-            arthur->y = (15-(arthur->tiley+1))*16;
-            arthur->position_y = (15-(arthur->tiley+1))*16;
-            arthur->yf = arthur->y*8;
+        if ( arthur->saut_down ){
+            if ( arthur->sens == 1 || arthur->sens == 0 ){
+                if ( arthur->tile_bottom_left == 267 
+                || arthur->tile_bottom_left == 375 
+                || arthur->tile_bottom_left == 377 
+                || arthur->tile_bottom_left == 378 
+                || arthur->tile_bottom_left == 357 
+                || arthur->tile_bottom_left == 80 
+                || arthur->tile_bottom_left == TILE_ECHELLE_END ){
+                    arthur->velocity = 35; // 35
+                    arthur->state = ARTHUR_SUR_LE_SOL;
+                    arthur->saut_up = 0;
+                    arthur->saut_down = 0;
+                    arthur->y = (15-(arthur->tiley+1))*16;
+                    arthur->position_y = (15-(arthur->tiley+1))*16;
+                    arthur->yf = arthur->y*8;
+                }
+                if ( arthur->tile_bottom_right == 267 
+                || arthur->tile_bottom_right == 375 
+                || arthur->tile_bottom_right == 377 
+                || arthur->tile_bottom_right == 378 
+                || arthur->tile_bottom_right == 357 
+                || arthur->tile_bottom_right == 80 
+                || arthur->tile_bottom_right == TILE_ECHELLE_END ){
+                    arthur->velocity = 35; // 35
+                    arthur->state = ARTHUR_SUR_LE_SOL;
+                    arthur->saut_up = 0;
+                    arthur->saut_down = 0;
+                    arthur->y = (15-(arthur->tiley+1))*16;
+                    arthur->position_y = (15-(arthur->tiley+1))*16;
+                    arthur->yf = arthur->y*8;
+                }
+            }
         }
 
         if ( pont->display == 1 ){
@@ -542,7 +575,8 @@ int arthur_can_go_to_left(arthur_t *arthur){
     char str[10];
     
     arthur->tiley = 15-((arthur->position_y>>4)+1);
-    u16 tile = tmx_sol[arthur->tiley+1][(arthur->absolute_bottom_right_x-10)>>4];
+    u16 tile_left = tmx_sol[arthur->tiley+1][(arthur->absolute_bottom_left_x-10)>>4];
+    u16 tile_right = tmx_sol[arthur->tiley+1][(arthur->absolute_bottom_right_x-10)>>4];
 
     if ( arthur->sens == 0 && arthur->absolute_bottom_left_x > 144 ){
 
@@ -557,10 +591,10 @@ int arthur_can_go_to_left(arthur_t *arthur){
         }
 
         if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-            if ( tile == 375 || tile == 357 ){
+            if ( tile_left == 375 || tile_left == 357 || tile_right == 375 || tile_right == 357 ){
                 return 1;
             }
-            else if ( tile == 0 ){
+            else if ( tile_left == 0 ){
                 return 2;
             }
         }
@@ -574,7 +608,8 @@ int arthur_can_go_to_right(arthur_t *arthur){
     char str[10];
 
     arthur->tiley = 15-((arthur->position_y>>4)+1);
-    u16 tile = tmx_sol[arthur->tiley+1][(arthur->absolute_bottom_left_x+10)>>4];
+    u16 tile_left = tmx_sol[arthur->tiley+1][(arthur->absolute_bottom_left_x+10)>>4];
+    u16 tile_right = tmx_sol[arthur->tiley+1][(arthur->absolute_bottom_right_x+10)>>4];
 
     if ( arthur->sens == 1 ){
 
@@ -589,10 +624,10 @@ int arthur_can_go_to_right(arthur_t *arthur){
         }
 
         if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-            if ( tile == 375 || tile == 357 ){
+            if ( tile_left == 375 || tile_left == 357 || tile_right == 375 || tile_right == 357 ){
                 return 1; 
             }
-            else if ( tile == 0 ){
+            else if ( tile_left == 0 ){
                 return 2;
             }
         }
@@ -619,6 +654,8 @@ void arthur_calcule_tiles(arthur_t *arthur){
 
     // --- On determine la tile sous Arthur
     arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
+    arthur->tile_bottom_left = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x)>>4)];
+    arthur->tile_bottom_right = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x)>>4)];
 }
 
 void arthur_tombe(arthur_t *arthur){

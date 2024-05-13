@@ -273,7 +273,9 @@ int main(void) {
                         // Saut vers la droite
                         arthur_jump_horizontal(&arthur);
                     }
-                    else arthur_walk_right(&arthur);
+                    else {
+                        arthur_walk_right(&arthur);
+                    }
                 }
             }
             else if ( bios_p1current & CNT_UP ){
