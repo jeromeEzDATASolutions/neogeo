@@ -55,6 +55,14 @@ extern u8 bios_p1current;
 #define ARTHUR_CROUCHING 1
 #define ARTHUR_ACCROUPI 2
 
+// --- Tuile dure sur lesquelles on peut marcher
+#define SOLDUR1 375
+#define SOLDUR2 357
+#define SOLDUR3 377
+#define SOLDUR4 378
+#define MURDURLEFT 377
+#define MURDURRIGHT 378
+
 // --- Tiles decor
 #define TILE_ECHELLE 397
 #define TILE_ECHELLE_END 398
@@ -340,8 +348,6 @@ int main(void) {
                 arthur_jump_vertical(&arthur);
             }
 
-            arthur_check_si_dans_le_vide(&arthur);
-
             // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
             // fadeInPalette(palettes1, 2);
 
@@ -449,6 +455,8 @@ int main(void) {
                 nuage.y = 140;
             }
         }
+
+        snprintf(str, 10, "TOM %4d", arthur.tile_bottom_middle); ng_text(2, 3, 0, str);
 
         ng_wait_vblank();
     }
