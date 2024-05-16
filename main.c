@@ -62,6 +62,7 @@ extern u8 bios_p1current;
 #define SOLDUR4 378
 #define MURDURLEFT 377
 #define MURDURRIGHT 378
+#define MURDURLEFTRIGHT 357
 
 // --- Tiles decor
 #define TILE_ECHELLE 397
@@ -456,8 +457,7 @@ int main(void) {
             }
         }
 
-        snprintf(str, 10, "TOM %4d", arthur.tile_bottom_middle); ng_text(2, 3, 0, str);
-
+        //snprintf(str, 10, "TOM %4d", arthur.tile_bottom_middle); ng_text(2, 3, 0, str);
         ng_wait_vblank();
     }
 

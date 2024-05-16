@@ -573,11 +573,25 @@ int arthur_can_go_to_left(arthur_t *arthur){
             }
         }
         else if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-            if ( arthur->tile_bottom_middle == SOLDUR1 || arthur->tile_bottom_middle == SOLDUR2 || arthur->tile_bottom_middle == SOLDUR3 || arthur->tile_bottom_middle == SOLDUR4 ) {
-                return 1;
+            // On checke déjà si un mur existe à droite
+            if ( arthur->tile_left == MURDURLEFT || arthur->tile_left == MURDURLEFTRIGHT ){
+                return 0;
             }
-            else if ( arthur->tile_bottom_middle == 0 ){
-                return 2;
+            else {
+                u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-12)>>4)];
+                snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 5, 0, str);
+                if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+                    return 1;
+                }
+                else {
+                    u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-22)>>4)];
+                    if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+                        return 1;
+                    }
+                    else if ( arthur->tile_bottom_left == 0 ){
+                        return 2;
+                    }
+                }
             }
         }
     }
@@ -602,13 +616,26 @@ int arthur_can_go_to_right(arthur_t *arthur){
                 return 2;
             }
         }
-
-        if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-            if ( arthur->tile_bottom_middle == SOLDUR1 || arthur->tile_bottom_middle == SOLDUR2 || arthur->tile_bottom_middle == SOLDUR3 || arthur->tile_bottom_middle == SOLDUR4 ) {
-                return 1;
+        else if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+            // On checke déjà si un mur existe à droite
+            if ( arthur->tile_right == MURDURLEFT || arthur->tile_right == MURDURLEFTRIGHT ){
+                return 0;
             }
-            else if ( arthur->tile_bottom_middle == 0 ){
-                return 2;
+            else {
+                u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+12)>>4)];
+                snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 5, 0, str);
+                if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+                    return 1;
+                }
+                else {
+                    u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+22)>>4)];
+                    if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+                        return 1;
+                    }
+                    else if ( arthur->tile_bottom_right == 0 ){
+                        return 2;
+                    }
+                }
             }
         }
     }
@@ -627,16 +654,16 @@ void arthur_calcule_tiles(arthur_t *arthur){
     arthur->tiley = 15-((arthur->position_y>>4)+1);
 
     // --- On determine la tile à droite d'Arthur
-    arthur->tile_right = tmx_sol[arthur->tiley][(arthur->absolute_bottom_left_x+32)>>4];
+    arthur->tile_right = tmx_sol[arthur->tiley][(arthur->absolute_bottom_right_x-4)>>4];
 
     // --- On determine la tile à gauche d'Arthur
     arthur->tile_left = tmx_sol[arthur->tiley][(arthur_sprite_x_left+4)>>4];
 
     // --- On determine la tile sous Arthur
     arthur->tile_bottom = tmx_sol[arthur->tiley+1][arthur->tilex];
-    arthur->tile_bottom_left = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x)>>4)];
+    arthur->tile_bottom_left = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+4)>>4)];
     arthur->tile_bottom_middle = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+16)>>4)];
-    arthur->tile_bottom_right = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x)>>4)];
+    arthur->tile_bottom_right = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-4)>>4)];
 }
 
 void arthur_tombe(arthur_t *arthur){
@@ -651,7 +678,9 @@ void arthur_tombe_update(arthur_t *arthur){
 
     if ( arthur->state == ARTHUR_TOMBE ){
 
-        if ( arthur->tile_bottom_middle == SOLDUR1 || arthur->tile_bottom_middle == SOLDUR2 || arthur->tile_bottom_middle == SOLDUR3 || arthur->tile_bottom_middle == SOLDUR4 ) {
+        u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+12)>>4)];
+        if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+        //if ( 1==2 && (arthur->tile_bottom_middle == SOLDUR1 || arthur->tile_bottom_middle == SOLDUR2 || arthur->tile_bottom_middle == SOLDUR3 || arthur->tile_bottom_middle == SOLDUR4 )) {
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->y = (15-(arthur->tiley+1))*16;
             arthur->position_y = (15-(arthur->tiley+1))*16;
