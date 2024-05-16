@@ -91,6 +91,7 @@ int palette_background_herbe_nuage[] = {1,2,6};
 
 static void scroll_left();
 static void scroll_right();
+static void scroll_top();
 
 // Plane and scrolling state
 #include "palette.c"
@@ -302,7 +303,7 @@ int main(void) {
                         arthur_calcule_tiles(&arthur);
                         arthur.frame_echelle_end=0;
                     }
-                    else if ( tmx_sol[arthur.tiley][arthur.tilex] == 398 ){
+                    else if ( tmx_sol[arthur.tiley][arthur.tilex] == TILE_ECHELLE_END ){
                         arthur.y++;
                         arthur.position_y++;
                         arthur.yf = arthur.y*8;
@@ -457,7 +458,7 @@ int main(void) {
             }
         }
 
-        //snprintf(str, 10, "TOM %4d", arthur.tile_bottom_middle); ng_text(2, 3, 0, str);
+        snprintf(str, 10, "TOM %4d", arthur.position_y); ng_text(2, 3, 0, str);
         ng_wait_vblank();
     }
 

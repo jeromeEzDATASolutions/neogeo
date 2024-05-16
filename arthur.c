@@ -368,7 +368,7 @@ int arthur_descend_echelle(arthur_t *arthur){
 
     if ( arthur->state == ARTHUR_SUR_LE_SOL ){
         // --- On checke si la tuile sous Arthur est une fin d'echelle
-        if ( arthur->tile_bottom == 398 ){
+        if ( arthur->tile_bottom == TILE_ECHELLE_END ){
 
             // On commence par la derniere etape
             // TODO
@@ -580,7 +580,7 @@ int arthur_can_go_to_left(arthur_t *arthur){
             else {
                 u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-12)>>4)];
                 snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 5, 0, str);
-                if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+                if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
                     return 1;
                 }
                 else {
@@ -624,7 +624,7 @@ int arthur_can_go_to_right(arthur_t *arthur){
             else {
                 u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+12)>>4)];
                 snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 5, 0, str);
-                if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+                if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
                     return 1;
                 }
                 else {
