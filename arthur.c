@@ -366,9 +366,20 @@ void arthur_accroupi(arthur_t *arthur){
 
 int arthur_descend_echelle(arthur_t *arthur){
 
+    char str[10];
+    u16 arthur_tile = 0;
+    if ( arthur->sens == 1 ){
+        arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+6)>>4)];
+    }
+    else {
+        arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-6)>>4)];
+    }
+
+    snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 3, 0, str);
+
     if ( arthur->state == ARTHUR_SUR_LE_SOL ){
         // --- On checke si la tuile sous Arthur est une fin d'echelle
-        if ( arthur->tile_bottom == TILE_ECHELLE_END ){
+        if ( arthur_tile == TILE_ECHELLE_END ){
 
             // On commence par la derniere etape
             // TODO
@@ -585,7 +596,7 @@ int arthur_can_go_to_left(arthur_t *arthur){
                 }
                 else {
                     u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-22)>>4)];
-                    if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+                    if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
                         return 1;
                     }
                     else if ( arthur->tile_bottom_left == 0 || arthur->tile_bottom_left == TILE_ECHELLE ){
@@ -629,7 +640,7 @@ int arthur_can_go_to_right(arthur_t *arthur){
                 }
                 else {
                     u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+22)>>4)];
-                    if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+                    if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
                         return 1;
                     }
                     else if ( arthur->tile_bottom_right == 0 || arthur->tile_bottom_right == TILE_ECHELLE ){

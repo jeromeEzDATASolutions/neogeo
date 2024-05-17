@@ -235,10 +235,7 @@ int main(void) {
             // --------------------------------------------------
             // --- ARTHUR BOTTOM
             // --------------------------------------------------
-            if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10){
-                u16 retour_descend_echelle = arthur_descend_echelle(&arthur);
-            }
-            else if (bios_p1current & CNT_LEFT ) {
+            if (bios_p1current & CNT_LEFT ) {
 
                 arthur.sens = 0;
 
@@ -288,12 +285,24 @@ int main(void) {
                     }
                 }
             }
+            else if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10){
+                u16 retour_descend_echelle = arthur_descend_echelle(&arthur);
+            }
             else if ( bios_p1current & CNT_UP ){
 
                 if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
 
+                    u16 arthur_tile = 0;
+
+                    if ( arthur.sens == 1 ){
+                        arthur_tile = tmx_sol[arthur.tiley][((arthur.absolute_bottom_left_x+6)>>4)];
+                    }
+                    else {
+                        arthur_tile = tmx_sol[arthur.tiley][((arthur.absolute_bottom_right_x-6)>>4)];
+                    }
+
                     // --- Arthur peut monter à l'échelle : tile 397
-                    if ( tmx_sol[arthur.tiley][arthur.tilex] == TILE_ECHELLE || tmx_sol[arthur.tiley][arthur.tilex] == 375 ){
+                    if ( arthur_tile == TILE_ECHELLE || arthur_tile == 375 ){
                         arthur.y++;
                         arthur.position_y++;
                         arthur.yf = arthur.y*8;
@@ -303,7 +312,7 @@ int main(void) {
                         arthur_calcule_tiles(&arthur);
                         arthur.frame_echelle_end=0;
                     }
-                    else if ( tmx_sol[arthur.tiley][arthur.tilex] == TILE_ECHELLE_END ){
+                    else if ( arthur_tile == TILE_ECHELLE_END ){
                         arthur.y++;
                         arthur.position_y++;
                         arthur.yf = arthur.y*8;
