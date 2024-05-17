@@ -573,13 +573,13 @@ int arthur_can_go_to_left(arthur_t *arthur){
             }
         }
         else if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-            // On checke déjà si un mur existe à droite
+            // On checke déjà si un mur existe à gauche
             if ( arthur->tile_left == MURDURLEFT || arthur->tile_left == MURDURLEFTRIGHT ){
-                return 0;
+                return 0; // ON BLOQUE ARTHUR
             }
             else {
                 u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-12)>>4)];
-                snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 5, 0, str);
+                //snprintf(str, 10, "T %4d", arthur_tile); ng_text(2, 5, 0, str);
                 if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
                     return 1;
                 }
@@ -588,7 +588,8 @@ int arthur_can_go_to_left(arthur_t *arthur){
                     if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
                         return 1;
                     }
-                    else if ( arthur->tile_bottom_left == 0 ){
+                    else if ( arthur->tile_bottom_left == 0 || arthur->tile_bottom_left == TILE_ECHELLE ){
+                        // Si aucune tile ou une tile d'echelle (pas la fin de l'echelle) alors on tombe
                         return 2;
                     }
                 }
@@ -596,7 +597,6 @@ int arthur_can_go_to_left(arthur_t *arthur){
         }
     }
 
-    //snprintf(str, 10, "TL %4d", arthur->tile_bottom_middle); ng_text(2, 5, 0, str);
     return 0;
 }
 
@@ -623,7 +623,7 @@ int arthur_can_go_to_right(arthur_t *arthur){
             }
             else {
                 u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+12)>>4)];
-                snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 5, 0, str);
+                //snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 5, 0, str);
                 if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
                     return 1;
                 }
@@ -632,7 +632,7 @@ int arthur_can_go_to_right(arthur_t *arthur){
                     if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
                         return 1;
                     }
-                    else if ( arthur->tile_bottom_right == 0 ){
+                    else if ( arthur->tile_bottom_right == 0 || arthur->tile_bottom_right == TILE_ECHELLE ){
                         return 2;
                     }
                 }
