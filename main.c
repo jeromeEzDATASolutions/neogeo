@@ -235,10 +235,7 @@ int main(void) {
             // --------------------------------------------------
             // --- ARTHUR BOTTOM
             // --------------------------------------------------
-            if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10){
-                u16 retour_descend_echelle = arthur_descend_echelle(&arthur);
-            }
-            else if (bios_p1current & CNT_LEFT ) {
+            if (bios_p1current & CNT_LEFT ) {
 
                 arthur.sens = 0;
 
@@ -288,12 +285,27 @@ int main(void) {
                     }
                 }
             }
+            else if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10){
+                u16 retour_descend_echelle = arthur_descend_echelle(&arthur);
+            }
             else if ( bios_p1current & CNT_UP ){
 
                 if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
 
-                    // --- Arthur peut monter à l'échelle : tile 397
-                    if ( tmx_sol[arthur.tiley][arthur.tilex] == 397 || tmx_sol[arthur.tiley][arthur.tilex] == 375 ){
+                    u16 arthur_tile1 = 0;
+                    u16 arthur_tile2 = 0;
+
+                    if ( arthur.sens == 1 ){
+                        arthur_tile1 = tmx_sol[arthur.tiley][((arthur.absolute_bottom_left_x+6)>>4)];
+                        arthur_tile2 = tmx_sol[arthur.tiley][((arthur.absolute_bottom_right_x-6)>>4)];
+                    }
+                    else {
+                        arthur_tile1 = tmx_sol[arthur.tiley][((arthur.absolute_bottom_right_x-6)>>4)];
+                        arthur_tile2 = tmx_sol[arthur.tiley][((arthur.absolute_bottom_left_x+6)>>4)];
+                    }
+
+                    // --- Arthur peut monter à l'échelle : tile TILE_ECHELLE
+                    if ( (arthur_tile1 == TILE_ECHELLE && arthur_tile2 == TILE_ECHELLE) || arthur_tile1 == SOLDUR1 ){
                         arthur.y++;
                         arthur.position_y++;
                         arthur.yf = arthur.y*8;
@@ -303,7 +315,7 @@ int main(void) {
                         arthur_calcule_tiles(&arthur);
                         arthur.frame_echelle_end=0;
                     }
-                    else if ( tmx_sol[arthur.tiley][arthur.tilex] == TILE_ECHELLE_END ){
+                    else if ( arthur_tile1 == TILE_ECHELLE_END || arthur_tile2 == TILE_ECHELLE_END ){
                         arthur.y++;
                         arthur.position_y++;
                         arthur.yf = arthur.y*8;
@@ -357,14 +369,14 @@ int main(void) {
                 arthur_jump_update(&arthur, &pont);
                 if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
                     if ( arthur.sens == 1 ){
-                        //if ( arthur.tile_right != 377 && arthur.tile_right != 357 && arthur.tile_right != 358 ){
+                        //if ( arthur.tile_right != SOLDUR3 && arthur.tile_right != SOLDUR2 && arthur.tile_right != 358 ){
                             arthur_update_posision_x_right(&arthur);
                             scroll_right();
                         //}
                     }
                     else {
                         if ( arthur.position_x > 144 ){
-                            if ( arthur.tile_left != 377 && arthur.tile_left != 357 && arthur.tile_left != 358 ){
+                            if ( arthur.tile_left != SOLDUR3 && arthur.tile_left != SOLDUR2 && arthur.tile_left != 358 ){
                                 arthur_update_posision_x_left(&arthur);
                                 scroll_left();
                             }
@@ -456,9 +468,10 @@ int main(void) {
                 nuage.x = 60;
                 nuage.y = 140;
             }
+
+            snprintf(str, 10, "ABLX %3d", arthur.absolute_bottom_left_x); ng_text(2, 3, 0, str);
         }
 
-        snprintf(str, 10, "TOM %4d", arthur.position_y); ng_text(2, 3, 0, str);
         ng_wait_vblank();
     }
 
