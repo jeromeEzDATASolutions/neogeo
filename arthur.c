@@ -137,7 +137,7 @@ arthur_t arthur_origin = {
     .frame_echelle_end = 0, 
     .frame_lance = 0, 
     .absolute_bottom_left_x = GNG_START_ARTHUR_POSISTION_X, 
-    .absolute_bottom_right_x = GNG_START_ARTHUR_POSISTION_X + (2*16), 
+    .absolute_bottom_right_x = GNG_START_ARTHUR_POSISTION_X + 32, 
     .tile_bottom_left = 0,
     .tile_bottom_middle = 0,
     .tile_bottom_right = 0,
@@ -367,19 +367,24 @@ void arthur_accroupi(arthur_t *arthur){
 int arthur_descend_echelle(arthur_t *arthur){
 
     char str[10];
-    u16 arthur_tile = 0;
+    u16 arthur_tile1 = 0;
+    u16 arthur_tile2 = 0;
+
     if ( arthur->sens == 1 ){
-        arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+6)>>4)];
+        arthur_tile1 = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+6)>>4)];
+        arthur_tile2 = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-6)>>4)];
     }
     else {
-        arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-6)>>4)];
+        arthur_tile1 = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-6)>>4)];
+        arthur_tile2 = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+6)>>4)];
     }
 
-    snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 3, 0, str);
+    //snprintf(str, 10, "TILE %4d", arthur_tile1); ng_text(2, 3, 0, str);
+    //snprintf(str, 10, "ABLX %4d", arthur->absolute_bottom_left_x); ng_text(2, 5, 0, str);
 
     if ( arthur->state == ARTHUR_SUR_LE_SOL ){
         // --- On checke si la tuile sous Arthur est une fin d'echelle
-        if ( arthur_tile == TILE_ECHELLE_END ){
+        if ( arthur_tile1 == TILE_ECHELLE_END && arthur_tile2 == TILE_ECHELLE_END ){
 
             // On commence par la derniere etape
             // TODO

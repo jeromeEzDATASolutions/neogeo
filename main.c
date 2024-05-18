@@ -292,17 +292,20 @@ int main(void) {
 
                 if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_ECHELLE ) {
 
-                    u16 arthur_tile = 0;
+                    u16 arthur_tile1 = 0;
+                    u16 arthur_tile2 = 0;
 
                     if ( arthur.sens == 1 ){
-                        arthur_tile = tmx_sol[arthur.tiley][((arthur.absolute_bottom_left_x+6)>>4)];
+                        arthur_tile1 = tmx_sol[arthur.tiley][((arthur.absolute_bottom_left_x+6)>>4)];
+                        arthur_tile2 = tmx_sol[arthur.tiley][((arthur.absolute_bottom_right_x-6)>>4)];
                     }
                     else {
-                        arthur_tile = tmx_sol[arthur.tiley][((arthur.absolute_bottom_right_x-6)>>4)];
+                        arthur_tile1 = tmx_sol[arthur.tiley][((arthur.absolute_bottom_right_x-6)>>4)];
+                        arthur_tile2 = tmx_sol[arthur.tiley][((arthur.absolute_bottom_left_x+6)>>4)];
                     }
 
                     // --- Arthur peut monter à l'échelle : tile 397
-                    if ( arthur_tile == TILE_ECHELLE || arthur_tile == 375 ){
+                    if ( (arthur_tile1 == TILE_ECHELLE && arthur_tile2 == TILE_ECHELLE) || arthur_tile1 == 375 ){
                         arthur.y++;
                         arthur.position_y++;
                         arthur.yf = arthur.y*8;
@@ -312,7 +315,7 @@ int main(void) {
                         arthur_calcule_tiles(&arthur);
                         arthur.frame_echelle_end=0;
                     }
-                    else if ( arthur_tile == TILE_ECHELLE_END ){
+                    else if ( arthur_tile1 == TILE_ECHELLE_END || arthur_tile2 == TILE_ECHELLE_END ){
                         arthur.y++;
                         arthur.position_y++;
                         arthur.yf = arthur.y*8;
@@ -465,10 +468,10 @@ int main(void) {
                 nuage.x = 60;
                 nuage.y = 140;
             }
+
+            snprintf(str, 10, "ABLX %3d", arthur.absolute_bottom_left_x); ng_text(2, 3, 0, str);
         }
 
-        //snprintf(str, 10, "TOM %4d", arthur.position_y); ng_text(2, 3, 0, str);
-        snprintf(str, 10, "frames %4d", frames); ng_text(2, 11, 0, str);
         ng_wait_vblank();
     }
 
