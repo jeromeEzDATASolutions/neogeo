@@ -469,7 +469,7 @@ int main(void) {
                 nuage.y = 140;
             }
 
-            snprintf(str, 10, "ABLX %3d", arthur.absolute_bottom_left_x); ng_text(2, 3, 0, str);
+            //snprintf(str, 10, "POSY %3d", arthur.position_y); ng_text(2, 9, 0, str);
         }
 
         ng_wait_vblank();
