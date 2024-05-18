@@ -384,7 +384,7 @@ int arthur_descend_echelle(arthur_t *arthur){
 
     if ( arthur->state == ARTHUR_SUR_LE_SOL ){
         // --- On checke si la tuile sous Arthur est une fin d'echelle
-        if ( arthur_tile1 == TILE_ECHELLE_END && arthur_tile2 == TILE_ECHELLE_END ){
+        if ( arthur_tile1 == TILE_ECHELLE_END || arthur_tile2 == TILE_ECHELLE_END ){
 
             // On commence par la derniere etape
             // TODO
