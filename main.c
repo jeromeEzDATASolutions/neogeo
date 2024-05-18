@@ -304,8 +304,8 @@ int main(void) {
                         arthur_tile2 = tmx_sol[arthur.tiley][((arthur.absolute_bottom_left_x+6)>>4)];
                     }
 
-                    // --- Arthur peut monter à l'échelle : tile 397
-                    if ( (arthur_tile1 == TILE_ECHELLE && arthur_tile2 == TILE_ECHELLE) || arthur_tile1 == 375 ){
+                    // --- Arthur peut monter à l'échelle : tile TILE_ECHELLE
+                    if ( (arthur_tile1 == TILE_ECHELLE && arthur_tile2 == TILE_ECHELLE) || arthur_tile1 == SOLDUR1 ){
                         arthur.y++;
                         arthur.position_y++;
                         arthur.yf = arthur.y*8;
@@ -369,14 +369,14 @@ int main(void) {
                 arthur_jump_update(&arthur, &pont);
                 if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
                     if ( arthur.sens == 1 ){
-                        //if ( arthur.tile_right != 377 && arthur.tile_right != 357 && arthur.tile_right != 358 ){
+                        //if ( arthur.tile_right != SOLDUR3 && arthur.tile_right != SOLDUR2 && arthur.tile_right != 358 ){
                             arthur_update_posision_x_right(&arthur);
                             scroll_right();
                         //}
                     }
                     else {
                         if ( arthur.position_x > 144 ){
-                            if ( arthur.tile_left != 377 && arthur.tile_left != 357 && arthur.tile_left != 358 ){
+                            if ( arthur.tile_left != SOLDUR3 && arthur.tile_left != SOLDUR2 && arthur.tile_left != 358 ){
                                 arthur_update_posision_x_left(&arthur);
                                 scroll_left();
                             }

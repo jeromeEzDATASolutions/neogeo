@@ -307,7 +307,7 @@ int arthur_walk_right(arthur_t *arthur){
     }
     if ( tmx_sol[arthur->tiley+1][arthur->tilex] != 0 && tmx_sol[arthur->tiley+1][arthur->tilex] != TILE_ECHELLE ){
         // Arthur ne peut marcher que sur le sol : tile 401
-        if ( arthur->tile_right == 377 || arthur->tile_right == 357 || arthur->tile_right == 358 ) {
+        if ( arthur->tile_right == SOLDUR3 || arthur->tile_right == SOLDUR2 || arthur->tile_right == 358 ) {
         }
         else {
             // Arthur peut marcher à droite
