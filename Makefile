@@ -144,18 +144,16 @@ sprites/pont.pal: sprites/pont.png
 	$(PALTOOL) $< -o $@
 
 # -------------------------------------
-# Fix layer Arme
+# Tombes
 # -------------------------------------
-sprites/fix.png: gfx/fix_arme.png | sprites
-	$(CONVERT) $^ $^ $^ +append -crop 320x240+0+0 +repage -background black -flatten $@
+sprites/tombe.png: gfx/tiles_tombe.png | sprites
+	$(CONVERT) $^ $^ $^ +append -crop 96x96+0+0 +repage -background black -flatten $@
 
-sprites/fix.c1 sprites/fix.c2: sprites/fix.png
+sprites/tombe.c1 sprites/tombe.c2: sprites/tombe.png
 	$(TILETOOL) --sprite -c $< -o $@ $(@:%.c1=%).c2
 
-sprites/fix.pal: sprites/fix.png
+sprites/tombe.pal: sprites/tombe.png
 	$(PALTOOL) $< -o $@
-
-
 
 
 $(ELF):	$(OBJS:%=%.o)
@@ -174,6 +172,7 @@ main.c: \
 	sprites/lance.pal \
 	sprites/map.pal \
 	sprites/pont.pal \
+	sprites/tombe.pal \
 
 # sound driver ROM: ngdevkit's nullsound
 MROMSIZE:=131072
@@ -196,6 +195,7 @@ $(CROM1): $(ASSETS)/rom/c1.bin \
 	sprites/lance.c1 \
 	sprites/map.c1 \
 	sprites/pont.c1 \
+	sprites/tombe.c1 \
 	| rom
 	cat $(ASSETS)/rom/c1.bin $(filter %.c1,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 
@@ -209,6 +209,7 @@ $(CROM2): $(ASSETS)/rom/c2.bin \
 	sprites/lance.c2 \
 	sprites/map.c2 \
 	sprites/pont.c2 \
+	sprites/tombe.c2 \
 	| rom
 	cat $(ASSETS)/rom/c2.bin $(filter %.c2,$^) > $@ && $(TRUNCATE) -s $(CROMSIZE) $@
 
