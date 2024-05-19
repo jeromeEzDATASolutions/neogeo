@@ -567,7 +567,7 @@ void arthur_jump_update(arthur_t *arthur, pont_t *pont){
                 u8 soldur_found = 0;
 
                 // TILE_ECHELLE_END
-                if ( arthur->tile_bottom_middle == SOLDUR1 || arthur->tile_bottom_middle == SOLDUR2 || arthur->tile_bottom_middle == SOLDUR3 || arthur->tile_bottom_middle == SOLDUR4 ){
+                if ( arthur->tile_bottom_middle == TILE_ECHELLE_END || arthur->tile_bottom_middle == SOLDUR1 || arthur->tile_bottom_middle == SOLDUR2 || arthur->tile_bottom_middle == SOLDUR3 || arthur->tile_bottom_middle == SOLDUR4 ){
                     soldur_found = 1;
                 }
 
