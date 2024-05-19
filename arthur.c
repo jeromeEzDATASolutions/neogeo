@@ -379,14 +379,15 @@ int arthur_descend_echelle(arthur_t *arthur){
         arthur_tile2 = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+6)>>4)];
     }
 
-    snprintf(str, 10, "TIL1 %4d", arthur_tile1); ng_text(2, 3, 0, str);
-    snprintf(str, 10, "TIL2 %4d", arthur_tile2); ng_text(2, 5, 0, str);
-    snprintf(str, 10, "ASE %4d", arthur->state); ng_text(2, 7, 0, str);
-    snprintf(str, 10, "POSY %3d", arthur->position_y); ng_text(2, 9, 0, str);
+    if ( DEBUG ){
+        snprintf(str, 10, "STAT %4d", arthur->state); ng_text(2, 7, 0, str);
+    }
 
     if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-        // --- On checke si la tuile sous Arthur est une fin d'echelle
-        if ( arthur_tile1 == TILE_ECHELLE_END || arthur_tile2 == TILE_ECHELLE_END ){
+
+        // --- On checke si la tile sous Arthur est une fin d'echelle
+        if ( arthur_tile1 == TILE_ECHELLE_END && arthur_tile2 == TILE_ECHELLE_END ){
+
             // On commence par la derniere etape
             // TODO
             arthur->y--;
@@ -396,13 +397,27 @@ int arthur_descend_echelle(arthur_t *arthur){
             arthur->frame_echelle++;
             arthur_sur_echelle_last_etape(arthur); // --- Display last etape from sprite Arthur sur echelle
             arthur_calcule_tiles(arthur);
+
+            if ( DEBUG ){
+                snprintf(str, 10, "TIL1 %4d", arthur_tile1); ng_text(2, 3, 0, str);
+                snprintf(str, 10, "TIL2 %4d", arthur_tile2); ng_text(2, 5, 0, str);
+                snprintf(str, 10, "ASE %4d", arthur->state); ng_text(2, 7, 0, str);
+                snprintf(str, 10, "POSY %3d", arthur->position_y); ng_text(2, 9, 0, str);
+                snprintf(str, 10, "POSY %3d", arthur->frame_echelle); ng_text(2, 11, 0, str);
+            }
         }
         else {
             // --- Arthur se baisse
             arthur_accroupi(arthur);
         }
     }
-    else if ( arthur->state == ARTHUR_SUR_ECHELLE ){
+    else {
+        if ( DEBUG ){
+            snprintf(str, 10, "%3d", arthur->state); ng_text(2, 17, 0, str);
+        }
+    }
+    
+    if ( arthur->state == ARTHUR_SUR_ECHELLE ){
         arthur->y--;
         arthur->position_y--;
         arthur->yf = arthur->y*8;
@@ -411,7 +426,19 @@ int arthur_descend_echelle(arthur_t *arthur){
         arthur_sur_echelle(arthur);
         arthur_calcule_tiles(arthur);
         arthur->frame_echelle_end=0;
-        if ( tmx_sol[arthur->tiley][arthur->tilex] == SOLDUR1 || tmx_sol[arthur->tiley][arthur->tilex] == SOLDUR2 || tmx_sol[arthur->tiley][arthur->tilex] == SOLDUR3 || tmx_sol[arthur->tiley][arthur->tilex] == SOLDUR4 ){
+
+        u16 tile1 = 0;
+        u16 tile2 = 0;
+        if ( arthur->sens == 1 ){
+            tile1 = tmx_sol[15-((arthur->position_y>>4)+1)][((arthur->absolute_bottom_left_x+6)>>4)];
+            tile2 = tmx_sol[15-((arthur->position_y>>4)+1)][((arthur->absolute_bottom_right_x-6)>>4)];
+        }
+        else {
+            tile1 = tmx_sol[15-((arthur->position_y>>4)+1)][((arthur->absolute_bottom_right_x-6)>>4)];
+            tile2 = tmx_sol[15-((arthur->position_y>>4)+1)][((arthur->absolute_bottom_left_x+6)>>4)];
+        }
+
+        if ( (tile1 == SOLDUR1 && tile2 == SOLDUR1) || (tile1 == SOLDUR2 && tile2 == SOLDUR2) || (tile1 == SOLDUR3 && tile2 == SOLDUR3) || (tile1 == SOLDUR4 && tile2 == SOLDUR4)){
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->y = (15-(arthur->tiley))*16;
             arthur->position_y = (15-(arthur->tiley))*16;

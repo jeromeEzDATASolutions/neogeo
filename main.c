@@ -77,7 +77,7 @@ extern u8 bios_p1current;
 #define FIX_ACCUM(x) (x>>FIX_FRACTIONAL_BITS)
 #define FIX_ZERO (FIX_POINT(1,0)-1)
 
-#define DEBUG 1
+#define DEBUG 0
 #define GAME_SPEED 1
 #define GAME_LEVEL_START 10  // 0 map, 10 level 1, 20 level 2
 
@@ -287,6 +287,7 @@ int main(void) {
             }
             else if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10){
                 u16 retour_descend_echelle = arthur_descend_echelle(&arthur);
+                snprintf(str, 10, "%3d %3d", frames, retour_descend_echelle); ng_text(2, 15, 0, str);
             }
             else if ( bios_p1current & CNT_UP ){
 
