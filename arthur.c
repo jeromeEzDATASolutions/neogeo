@@ -584,71 +584,17 @@ void arthur_jump_update(arthur_t *arthur, pont_t *pont){
         }
 
         if ( pont->display == 1 ){
-
             if ( arthur->y > 26 && arthur->y < 32 ) {
-
-                // --- Arthur saute vers la droite
-                if ( arthur->sens == 1 ){
-                    // --- Le pont se deplace aussi vers la droite
-                    if ( pont->sens == 1 ){
-                        if ( (arthur->x+16-6) >= pont->x && (arthur->x+16+6) <= (pont->x)+32 ){
-                            arthur->velocity = 35;
-                            arthur->state = ARTHUR_SUR_PLATEFORME;
-                            arthur->saut_up = 0;
-                            arthur->saut_down = 0;
-                            arthur->y = pont->y+16;
-                            arthur->position_y = pont->y+16;
-                            arthur->yf = arthur->y*8;
-                        }
-                    }
-                    else if ( pont->sens == 0 ){
-                        if ( (arthur->x+16-6) >= pont->x && (arthur->x+16+6) <= (pont->x)+32 ){
-                            arthur->velocity = 35;
-                            arthur->state = ARTHUR_SUR_PLATEFORME;
-                            arthur->saut_up = 0;
-                            arthur->saut_down = 0;
-                            arthur->y = pont->y+16;
-                            arthur->position_y = pont->y+16;
-                            arthur->yf = arthur->y*8;
-                        }
-                    }
-                }
-                else if ( arthur->sens == 0 ){
-                    // --- Arthur saute vers la gauche
-                    if ( pont->sens == 0 ){
-                        if ( (arthur->x+16-6) >= pont->x && (arthur->x+16+6) <= (pont->x)+32 ){
-                            arthur->velocity = 35;
-                            arthur->state = ARTHUR_SUR_PLATEFORME;
-                            arthur->saut_up = 0;
-                            arthur->saut_down = 0;
-                            arthur->y = pont->y+16;
-                            arthur->position_y = pont->y+16;
-                            arthur->yf = arthur->y*8;
-                        }
-                    }
-                    else if ( pont->sens == 1 ){
-                        if ( (arthur->x+16-6) >= pont->x && (arthur->x+16+6) <= (pont->x)+32 ){
-                            arthur->velocity = 35;
-                            arthur->state = ARTHUR_SUR_PLATEFORME;
-                            arthur->saut_up = 0;
-                            arthur->saut_down = 0;
-                            arthur->y = pont->y+16;
-                            arthur->position_y = pont->y+16;
-                            arthur->yf = arthur->y*8;
-                        }
-                    }
+                if ( (arthur->x+16-6) >= pont->x && (arthur->x+16+6) <= (pont->x)+32 ){
+                    arthur->velocity = 35;
+                    arthur->state = ARTHUR_SUR_PLATEFORME;
+                    arthur->saut_up = 0;
+                    arthur->saut_down = 0;
+                    arthur->y = pont->y+16;
+                    arthur->position_y = pont->y+16;
+                    arthur->yf = arthur->y*8;
                 }
             }
-
-            /*if ( arthur->y < 32 && arthur->x >= pont->x && arthur->x <= (pont->x)+32 ){
-                arthur->velocity = 35; // 35
-                arthur->state = ARTHUR_SUR_PLATEFORME;
-                arthur->saut_up = 0;
-                arthur->saut_down = 0;
-                arthur->y = pont->y+16;
-                arthur->position_y = pont->y+16;
-                arthur->yf = arthur->y*8;
-            }*/
         }
 
         arthur_update(arthur);
@@ -778,18 +724,34 @@ void arthur_tombe_update(arthur_t *arthur){
 
         u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+12)>>4)];
         if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
-        //if ( 1==2 && (arthur->tile_bottom_middle == SOLDUR1 || arthur->tile_bottom_middle == SOLDUR2 || arthur->tile_bottom_middle == SOLDUR3 || arthur->tile_bottom_middle == SOLDUR4 )) {
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->y = (15-(arthur->tiley+1))*16;
             arthur->position_y = (15-(arthur->tiley+1))*16;
             arthur->yf = arthur->y*8;
-            arthur_calcule_tiles(arthur);
+            //arthur_calcule_tiles(arthur);
         }
-        else{
+        else {
+            if ( pont.display == 1 ){
+                if ( arthur->y > 0 && arthur->y < 32 ) {
+                    //snprintf(str, 10, "PONT %3d", arthur->y); ng_text(2, 3, 0, str);
+                    if ( (arthur->x+16-6) >= pont.x && (arthur->x+16+6) <= (pont.x)+32 ){
+                        arthur->velocity = 35;
+                        arthur->state = ARTHUR_SUR_PLATEFORME;
+                        arthur->saut_up = 0;
+                        arthur->saut_down = 0;
+                        arthur->y = pont.y+16;
+                        arthur->position_y = pont.y+16;
+                        arthur->yf = arthur->y*8;
+                    }
+                }
+            }
+        }
+
+        if ( arthur->state == ARTHUR_TOMBE ){
             if ( arthur->position_y > 0 ){
                 arthur->y-=10;
                 arthur->position_y-=10;
-                arthur_calcule_tiles(arthur);
+                //arthur_calcule_tiles(arthur);
                 arthur_update(arthur);
             }
         }
