@@ -41,6 +41,9 @@ extern u8 bios_p1current;
 #define CROM_TILE_START_LANCE2 79 // 2
 #define CROM_TILE_START_LANCE3 81 // 2
 #define CROM_TILE_START_MAP 1 // 32
+#define CROM_TILE_START_TOMBE1 83 // 2
+#define CROM_TILE_START_TOMBE2 85 // 2
+#define CROM_TILE_START_TOMBE3 87 // 2
 
 // --- States for Arthur
 #define ARTHUR_SUR_LE_SOL 0
@@ -101,6 +104,7 @@ static void scroll_top();
 #include "nuage.c"
 #include "lance.c"
 #include "map.c" // Intro avant d'afficher le Niveau 1
+#include "tombe.c"
 
 u16 gng_niveau = GAME_LEVEL_START;
 
@@ -197,6 +201,10 @@ int main(void) {
             // --- Display sprites Lances
             lances_init(lances);
 
+            // --- Display sprites Tombes
+            tombes_init(tombes);
+            tombe_update(&tombes[0]);
+
             // --- Display background
             fadeOutPalette(palettes_background_herbe_eau_nuage, 4);
 
@@ -287,7 +295,6 @@ int main(void) {
             }
             else if (bios_p1current == 6 || bios_p1current == CNT_BOTTOM || bios_p1current == 10){
                 u16 retour_descend_echelle = arthur_descend_echelle(&arthur);
-                snprintf(str, 10, "%3d %3d", frames, retour_descend_echelle); ng_text(2, 15, 0, str);
             }
             else if ( bios_p1current & CNT_UP ){
 
