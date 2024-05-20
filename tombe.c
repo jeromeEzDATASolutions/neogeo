@@ -23,7 +23,7 @@ tombe_t tombes[3] = {
         .width = 2,
         .height = 2,
         .x = 50,
-        .y = 60,
+        .y = 40,
     }, 
     {
         .sprite = CROM_TILE_START_TOMBE2,
@@ -33,7 +33,7 @@ tombe_t tombes[3] = {
         .width = 2,
         .height = 2,
         .x = 100,
-        .y = 60,
+        .y = 52,
     },
     {
         .sprite = CROM_TILE_START_TOMBE3,
@@ -43,7 +43,7 @@ tombe_t tombes[3] = {
         .width = 2,
         .height = 2,
         .x = 200,
-        .y = 60,
+        .y = 40,
     },
 };
 
