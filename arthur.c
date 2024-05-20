@@ -584,7 +584,39 @@ void arthur_jump_update(arthur_t *arthur, pont_t *pont){
         }
 
         if ( pont->display == 1 ){
-            if ( arthur->y < 32 && arthur->x >= pont->x && arthur->x <= (pont->x)+32 ){
+
+            if ( arthur->y < 32 ) {
+
+                // --- Arthur saute vers la droite
+                if ( arthur->sens == 1 ){
+                    // --- Le pont se deplace aussi vers la droite
+                    if ( pont->sens == 1 ){
+                        if ( (arthur->x+16) >= pont->x && (arthur->x+16) <= (pont->x)+32 ){
+                            arthur->velocity = 35;
+                            arthur->state = ARTHUR_SUR_PLATEFORME;
+                            arthur->saut_up = 0;
+                            arthur->saut_down = 0;
+                            arthur->y = pont->y+16;
+                            arthur->position_y = pont->y+16;
+                            arthur->yf = arthur->y*8;
+                        }
+                    }
+                    else if ( pont->sens == 0 ){
+                        if ( (arthur->x+16) >= pont->x && (arthur->x+16) <= (pont->x)+32 ){
+                            arthur->velocity = 35;
+                            arthur->state = ARTHUR_SUR_PLATEFORME;
+                            arthur->saut_up = 0;
+                            arthur->saut_down = 0;
+                            arthur->y = pont->y+16;
+                            arthur->position_y = pont->y+16;
+                            arthur->yf = arthur->y*8;
+                        }
+                    }
+                }
+
+            }
+
+            /*if ( arthur->y < 32 && arthur->x >= pont->x && arthur->x <= (pont->x)+32 ){
                 arthur->velocity = 35; // 35
                 arthur->state = ARTHUR_SUR_PLATEFORME;
                 arthur->saut_up = 0;
@@ -592,7 +624,7 @@ void arthur_jump_update(arthur_t *arthur, pont_t *pont){
                 arthur->y = pont->y+16;
                 arthur->position_y = pont->y+16;
                 arthur->yf = arthur->y*8;
-            }
+            }*/
         }
 
         arthur_update(arthur);
