@@ -16,6 +16,7 @@ const u16 clut[][16]= {
     #include "sprites/lance.pal"
     #include "sprites/map.pal"
     #include "sprites/pont.pal" // Palette 9
+    #include "sprites/tombe.pal" // Palette 10
 };
 
 const u16 palette_backup[][16]= {
@@ -31,6 +32,7 @@ const u16 palette_backup[][16]= {
     #include "sprites/lance.pal"
     #include "sprites/map.pal"
     #include "sprites/pont.pal" // Palette 9
+    #include "sprites/tombe.pal" // Palette 10
 };
 
 const u16 paletes_from_tile[][2] = {
@@ -41,7 +43,9 @@ const u16 paletes_from_tile[][2] = {
     {547, 5}, 
     {667, 6},
     {709, 7},
-    {713, 8},
+    {713, 8}, // Map
+    {794, 9}, // Pont
+    {796, 10}, // Tombe
 };
 
 void init_palette() {
