@@ -202,8 +202,8 @@ int main(void) {
             lances_init(lances);
 
             // --- Display sprites Tombes
-            tombes_init(tombes);
-            tombe_update(&tombes[0]);
+            //tombes_init(tombes);
+            //tombe_update(&tombes[0]);
 
             // --- Display background
             fadeOutPalette(palettes_background_herbe_eau_nuage, 4);
