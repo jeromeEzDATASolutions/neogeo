@@ -69,19 +69,17 @@ sprites/flotte.c1 sprites/flotte.c2: sprites/flotte.png
 sprites/flotte.pal: sprites/flotte.png
 	$(PALTOOL) $< -o $@
 
-
 # -------------------------------------------- #
 # --- Arthur1                                  #
 # -------------------------------------------- #
 sprites/arthur1.png: gfx/tiles_arthur1.png | sprites
-	$(CONVERT) $^ $^ $^ +append -crop 320x96+0+0 +repage -background black -flatten $@
+	$(CONVERT) $^ $^ $^ +append -crop 320x128+0+0 +repage -background black -flatten $@
 
 sprites/arthur1.c1 sprites/arthur1.c2: sprites/arthur1.png
 	$(TILETOOL) --sprite -c $< -o $@ $(@:%.c1=%).c2
 
 sprites/arthur1.pal: sprites/arthur1.png
 	$(PALTOOL) $< -o $@
-
 
 # -------------------------------------------- #
 # --- Arthur2                                  #
