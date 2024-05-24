@@ -57,6 +57,7 @@ extern u8 bios_p1current;
 #define ARTHUR_DEBOUT 0
 #define ARTHUR_CROUCHING 1
 #define ARTHUR_ACCROUPI 2
+#define ARTHUR_LANCE 3 // Arthur est en train de lancer une arme
 
 // --- Tuile dure sur lesquelles on peut marcher
 #define SOLDUR1 375

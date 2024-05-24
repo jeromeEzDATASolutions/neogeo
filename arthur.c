@@ -3,7 +3,7 @@
  * Structure & functions for the background
  */
 
-#define GNG_ARTHUR_TMX_WIDTH 34
+#define GNG_ARTHUR_TMX_WIDTH 36
 #define GNG_ARTHUR_TMX_HEIGHT 7
 
 #define FIXED_POINT 8
@@ -372,6 +372,8 @@ void arthur_lance_arme(arthur_t *arthur){
     arthur->tile_offset_y=2;
     if ( arthur->sens == 1 )
         arthur->tile_offset_y=0;
+
+    arthur->position = ARTHUR_LANCE;
 
     arthur_update(arthur);
 }
