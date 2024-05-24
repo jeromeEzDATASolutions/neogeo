@@ -348,6 +348,7 @@ int main(void) {
                 }
             }
             else if ( b1 ) {
+                arthur_lance_arme(&arthur);
                 lance_start(lances, arthur.x, arthur.y);
             }
             else if ( arthur.state == ARTHUR_SUR_LE_SOL ){

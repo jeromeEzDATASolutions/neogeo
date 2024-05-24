@@ -20,6 +20,7 @@
 #define GNG_ARTHUR_TILES_ECHELLE 24
 #define GNG_ARTHUR_TILES_ECHELLE_END 26
 #define GNG_ARTHUR_TILES_CUL 32
+#define GNG_ARTHUR_TILES_LANCE_ARME 34
 
 static void arthur_init_tmx();
 static int arthur_walk_right();
@@ -361,6 +362,17 @@ void arthur_accroupi(arthur_t *arthur){
 
     arthur->position = ARTHUR_ACCROUPI;
     
+    arthur_update(arthur);
+}
+
+void arthur_lance_arme(arthur_t *arthur){
+
+    arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME);
+
+    arthur->tile_offset_y=2;
+    if ( arthur->sens == 1 )
+        arthur->tile_offset_y=0;
+
     arthur_update(arthur);
 }
 
