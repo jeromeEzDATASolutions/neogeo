@@ -400,6 +400,7 @@ int main(void) {
             // ------------------------------------------
             // Premier PONT
             // ------------------------------------------
+            /*
             if ( arthur.position_x == 156 && pont.display == 0 ){
                 pont_display(&pont);
             }
@@ -415,6 +416,7 @@ int main(void) {
                     pont_display_left(&pont);
                 }
             }
+            */
 
             // ------------------------------------------
             // Deuxieme PONT

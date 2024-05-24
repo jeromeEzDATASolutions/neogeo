@@ -722,13 +722,13 @@ void arthur_tombe_update(arthur_t *arthur){
 
     if ( arthur->state == ARTHUR_TOMBE ){
 
-        u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+12)>>4)];
-        if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 ) {
+        //u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+12)>>4)];
+        if ( arthur->tile_bottom_middle == TILE_ECHELLE_END || arthur->tile_bottom_middle == SOLDUR1 || arthur->tile_bottom_middle == SOLDUR2 || arthur->tile_bottom_middle == SOLDUR3 || arthur->tile_bottom_middle == SOLDUR4 ){
             arthur->state = ARTHUR_SUR_LE_SOL;
             arthur->y = (15-(arthur->tiley+1))*16;
             arthur->position_y = (15-(arthur->tiley+1))*16;
             arthur->yf = arthur->y*8;
-            //arthur_calcule_tiles(arthur);
+            arthur_calcule_tiles(arthur);
         }
         else {
             if ( pont.display == 1 ){
@@ -751,7 +751,7 @@ void arthur_tombe_update(arthur_t *arthur){
             if ( arthur->position_y > 0 ){
                 arthur->y-=10;
                 arthur->position_y-=10;
-                //arthur_calcule_tiles(arthur);
+                arthur_calcule_tiles(arthur);
                 arthur_update(arthur);
             }
         }
