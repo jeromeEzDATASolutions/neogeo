@@ -39,6 +39,7 @@ static void arthur_update_posision_x_left();
 static void arthur_update_posision_x_right();
 static int arthur_can_go_to_left();
 static int arthur_can_go_to_right();
+static void arthur_lance_arme();
 
 typedef struct _arthur_t {
     u16 sprite;
@@ -77,7 +78,7 @@ typedef struct _arthur_t {
     u16 tile_bottom_right;
 } arthur_t;
 
-arthur_t arthur = {
+static arthur_t arthur = {
     .sprite = CROM_TILE_START_ARTHUR,
     .tile_offset_x = 0, // Décalage si besoin de la première colonne pour Arthur
     .tile_offset_y = 0, // Arthur à gauche : ligne 2
@@ -373,26 +374,90 @@ void arthur_accroupi(arthur_t *arthur){
 
 void arthur_lance_arme(arthur_t *arthur){
 
-    arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT1);
+    if ( arthur->state == ARTHUR_SUR_LE_SOL ) {
 
-    arthur->tile_offset_y=2;
-    if ( arthur->sens == 1 ){
-        arthur->tile_offset_y=0;
+        if ( arthur->position != ARTHUR_LANCE && arthur->position == ARTHUR_DEBOUT ){
+
+            // --- Est-ce que Arthur peut lancer une lance
+            u8 all_lances_cachees = 1;
+
+            for (u16 s=0; s<3; s++) {
+                if ( lances[s].state != ARTHUR_LANCE_STATE_CACHEE ){
+                    all_lances_cachees = 0;
+                }
+            }
+
+            if ( all_lances_cachees == 1 || (lances[arthur->frame_lance].state == ARTHUR_LANCE_STATE_CACHEE && (frames%5)==0)) {
+
+                if ( arthur->sens == 1 ){
+                    lances[arthur->frame_lance].x = arthur->x + 20;
+                    lances[arthur->frame_lance].y = arthur->y + 18;
+                }
+                else {
+                    lances[arthur->frame_lance].x = arthur->x - 20;
+                    lances[arthur->frame_lance].y = arthur->y + 18;
+                }
+
+                if ( arthur->position == ARTHUR_ACCROUPI ){
+                    lances[arthur->frame_lance].y = arthur->y + 8;
+                }
+
+                lances[arthur->frame_lance].state = ARTHUR_LANCE_STATE_LANCEE;
+                lances[arthur->frame_lance].sens = arthur->sens;
+                lance_update(&lances[arthur->frame_lance]);
+
+                arthur->frame_lance = arthur->frame_lance+1;
+                if ( arthur->frame_lance == 3 ){
+                    arthur->frame_lance = 0;
+                }
+
+                // --- Une lance est partie, on provoque le mouvement du lancer en 2 étapes
+                arthur->frame_mvt_lance = 0;
+                arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT1);
+                arthur->tile_offset_y=2;
+                if ( arthur->sens == 1 ){
+                    arthur->tile_offset_y=0;
+                }
+                arthur->position = ARTHUR_LANCE;
+                arthur_update(arthur);
+            }
+        }
     }
+}
 
-    arthur->position = ARTHUR_LANCE;
+void arthur_lance_arme_evolution(arthur_t *arthur){
 
-    arthur->frame_mvt_lance++;
+    if ( arthur->position == ARTHUR_LANCE ){
 
-    if ( arthur->frame_mvt_lance >=5 && arthur->frame_mvt_lance <= 10 ){
-        arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT2);
+        u16 frames1 = 5;
+        u16 frames2 = 10;
+        u16 frames3 = 10;
+
+        arthur->frame_mvt_lance++;
+
+        arthur->tile_offset_y=2;
+        if ( arthur->sens == 1 ){
+            arthur->tile_offset_y=0;
+        }
+
+        if ( arthur->frame_mvt_lance == frames1 ){
+            //lance_start(arthur->x, arthur->y);
+        }
+
+        if ( arthur->frame_mvt_lance >= frames1 && arthur->frame_mvt_lance <= frames2 ){
+            arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT2);
+        }
+        else if ( arthur->frame_mvt_lance > frames2 && arthur->frame_mvt_lance <= frames3 ) {
+            arthur_set_position(arthur, GNG_ARTHUR_TILES_DEBOUT);
+        }
+        else if ( arthur->frame_mvt_lance > frames3 ) {
+            arthur_set_position(arthur, GNG_ARTHUR_TILES_DEBOUT);
+            arthur->position = ARTHUR_DEBOUT;
+            arthur->frame_mvt_lance = 0;
+        }
+
+        arthur_update(arthur);
     }
-    else if ( arthur->frame_mvt_lance > 10 ) {
-        arthur_set_position(arthur, GNG_ARTHUR_TILES_DEBOUT);
-        arthur->frame_mvt_lance = 0;
-    }
-
-    arthur_update(arthur);
 }
 
 int arthur_descend_echelle(arthur_t *arthur){
@@ -714,6 +779,7 @@ int arthur_can_go_to_right(arthur_t *arthur){
             }
         }
     }
+
 
     return 0; 
 }

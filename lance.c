@@ -2,23 +2,6 @@
  * Copyright (c) 2020 Jérôme BRACONNIER
  * Structure & functions for the background
  */
-#define ARTHUR_LANCE_VITESSE 5
-#define ARTHUR_LANCE_STATE_CACHEE 1
-#define ARTHUR_LANCE_STATE_LANCEE 2
-
-typedef struct _lance_t {
-    u16 sprite;
-    u16 tile_offset_x;
-    u16 tile_offset_y;
-    u16 palette;
-    u16 width;
-    u16 height;
-    s16 x;
-    s16 y;
-    u16 sens;               // 0 left or 1 right
-    u8 state;               // CACHEE
-} lance_t;
-
 lance_t lances[3] = {
     {
         .sprite = CROM_TILE_START_LANCE1,
@@ -121,7 +104,8 @@ void lance_update(lance_t *p_lance){
     *REG_VRAMRW=(p_lance->x<<7);
 }
 
-void lance_start(lance_t p_lances[], s16 arthur_x, s16 arthur_y) {
+/*
+void lance_start(s16 arthur_x, s16 arthur_y) {
 
     // --- Arthur tire des lances sauf s'il est sur une échell
     if ( arthur.state != ARTHUR_SUR_ECHELLE ){
@@ -160,6 +144,7 @@ void lance_start(lance_t p_lances[], s16 arthur_x, s16 arthur_y) {
         }
     }
 }
+*/
 
 void lances_hide(lance_t p_lances[]){
     for(u16 i=0; i<3; i++){

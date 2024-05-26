@@ -22,6 +22,7 @@
 #include <ngdevkit/ng-fix.h>
 #include <ngdevkit/ng-video.h>
 #include <stdio.h>
+#include "lance.h"
 
 // Current state of player 1's controller
 extern u8 bios_p1current;
@@ -58,6 +59,11 @@ extern u8 bios_p1current;
 #define ARTHUR_CROUCHING 1
 #define ARTHUR_ACCROUPI 2
 #define ARTHUR_LANCE 3 // Arthur est en train de lancer une arme
+
+// --- Lances
+#define ARTHUR_LANCE_VITESSE 5
+#define ARTHUR_LANCE_STATE_CACHEE 1
+#define ARTHUR_LANCE_STATE_LANCEE 2
 
 // --- Tuile dure sur lesquelles on peut marcher
 #define SOLDUR1 375
@@ -97,13 +103,15 @@ static void scroll_left();
 static void scroll_right();
 static void scroll_top();
 
+static void lance_update();
+
 // Plane and scrolling state
 #include "palette.c"
 #include "background.c"
 #include "pont.c"
 #include "arthur.c"
-#include "nuage.c"
 #include "lance.c"
+#include "nuage.c"
 #include "map.c" // Intro avant d'afficher le Niveau 1
 #include "tombe.c"
 
@@ -281,7 +289,7 @@ int main(void) {
 
                 arthur.sens = 1;
 
-                if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_PLATEFORME){
+                if ( (arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_PLATEFORME) && arthur.position != ARTHUR_LANCE ){
 
                     arthur.frames++;
 
@@ -349,13 +357,14 @@ int main(void) {
                 }
             }
             else if ( b1 ) {
-                //arthur_lance_arme(&arthur);
-                lance_start(lances, arthur.x, arthur.y);
+                arthur_lance_arme(&arthur);
             }
             else if ( arthur.state == ARTHUR_SUR_LE_SOL ){
-                // Position neutre de Arthur
-                arthur.position=ARTHUR_DEBOUT;
-                arthur_stop_walk(&arthur);
+                if ( arthur.position != ARTHUR_LANCE ){
+                    // Position neutre de Arthur
+                    arthur.position=ARTHUR_DEBOUT;
+                    arthur_stop_walk(&arthur);
+                }
             }
 
             // ---------------------------------------- //
@@ -363,8 +372,9 @@ int main(void) {
             // ---------------------------------------- //
             if ( b1 ) {
                 arthur_lance_arme(&arthur);
-                lance_start(lances, arthur.x, arthur.y);
             }
+
+            arthur_lance_arme_evolution(&arthur);
 
             // ---------------------------------------- //
             // --- Appui sur button B : on saute        //
@@ -482,7 +492,9 @@ int main(void) {
                 nuage.y = 140;
             }
 
-            snprintf(str, 10, "POSY %3d", arthur.frame_mvt_lance); ng_text(2, 3, 0, str);
+            //snprintf(str, 10, "P1 %3d", lances[0].x); ng_text(2, 3, 0, str);
+            //snprintf(str, 10, "LAN %3d", arthur.frame_mvt_lance); ng_text(2, 3, 0, str);
+            //snprintf(str, 10, "POSA %3d", arthur.position); ng_text(2, 5, 0, str);
         }
 
         ng_wait_vblank();
