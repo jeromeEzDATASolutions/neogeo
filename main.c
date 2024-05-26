@@ -58,7 +58,6 @@ extern u8 bios_p1current;
 #define ARTHUR_DEBOUT 0
 #define ARTHUR_CROUCHING 1
 #define ARTHUR_ACCROUPI 2
-#define ARTHUR_LANCE 3 // Arthur est en train de lancer une arme
 
 // --- Lances
 #define ARTHUR_LANCE_VITESSE 5
@@ -289,7 +288,7 @@ int main(void) {
 
                 arthur.sens = 1;
 
-                if ( (arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_PLATEFORME) && arthur.position != ARTHUR_LANCE ){
+                if ( (arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_PLATEFORME) && arthur.tir1 == 0 && arthur.tir2 == 0 && arthur.tir3 == 0 ){
 
                     arthur.frames++;
 
@@ -360,7 +359,7 @@ int main(void) {
                 arthur_lance_arme(&arthur);
             }
             else if ( arthur.state == ARTHUR_SUR_LE_SOL ){
-                if ( arthur.position != ARTHUR_LANCE ){
+                if ( arthur.tir1 == 0 && arthur.tir2 == 0 && arthur.tir3 == 0 ){
                     // Position neutre de Arthur
                     arthur.position=ARTHUR_DEBOUT;
                     arthur_stop_walk(&arthur);

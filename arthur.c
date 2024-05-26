@@ -3,7 +3,7 @@
  * Structure & functions for the background
  */
 
-#define GNG_ARTHUR_TMX_WIDTH 38
+#define GNG_ARTHUR_TMX_WIDTH 42
 #define GNG_ARTHUR_TMX_HEIGHT 7
 
 #define FIXED_POINT 8
@@ -21,8 +21,10 @@
 #define GNG_ARTHUR_TILES_ECHELLE 24
 #define GNG_ARTHUR_TILES_ECHELLE_END 26
 #define GNG_ARTHUR_TILES_CUL 32
-#define GNG_ARTHUR_TILES_LANCE_ARME_MVT1 34
-#define GNG_ARTHUR_TILES_LANCE_ARME_MVT2 36
+#define GNG_ARTHUR_TILES_LANCE_ARME_MVT1_DEBOUT 34
+#define GNG_ARTHUR_TILES_LANCE_ARME_MVT2_DEBOUT 36
+#define GNG_ARTHUR_TILES_LANCE_ARME_MVT1_ACCROUPI 38
+#define GNG_ARTHUR_TILES_LANCE_ARME_MVT2_ACCROUPI 40
 
 static void arthur_init_tmx();
 static int arthur_walk_right();
@@ -76,6 +78,9 @@ typedef struct _arthur_t {
     u16 tile_bottom_left;
     u16 tile_bottom_middle;
     u16 tile_bottom_right;
+    u8 tir1;
+    u8 tir2;
+    u8 tir3;
 } arthur_t;
 
 static arthur_t arthur = {
@@ -112,6 +117,9 @@ static arthur_t arthur = {
     .tile_bottom_left = 0, 
     .tile_bottom_middle = 0, 
     .tile_bottom_right = 0,
+    .tir1 = 0,
+    .tir2 = 0,
+    .tir3 = 0,
 };
 
 arthur_t arthur_origin = {
@@ -148,6 +156,9 @@ arthur_t arthur_origin = {
     .tile_bottom_left = 0,
     .tile_bottom_middle = 0,
     .tile_bottom_right = 0,
+    .tir1 = 0,
+    .tir2 = 0,
+    .tir3 = 0,
 };
 
 void arthur_reset(arthur_t *arthur, arthur_t *arthur_origin){
@@ -183,6 +194,9 @@ void arthur_reset(arthur_t *arthur, arthur_t *arthur_origin){
     arthur->tile_bottom_left = arthur_origin->tile_bottom_left;
     arthur->tile_bottom_middle = arthur_origin->tile_bottom_middle;
     arthur->tile_bottom_right = arthur_origin->tile_bottom_right;
+    arthur->tir1 = arthur_origin->tir1;
+    arthur->tir2 = arthur_origin->tir2;
+    arthur->tir3 = arthur_origin->tir3;
 }
 
 void arthur_init_tmx(arthur_t *arthur){
@@ -376,7 +390,7 @@ void arthur_lance_arme(arthur_t *arthur){
 
     if ( arthur->state == ARTHUR_SUR_LE_SOL ) {
 
-        if ( arthur->position != ARTHUR_LANCE && arthur->position == ARTHUR_DEBOUT ){
+        if ( (arthur->tir1 == 0 && arthur->tir2 == 0 && arthur->tir3 == 0) && ( arthur->position == ARTHUR_DEBOUT || arthur->position == ARTHUR_ACCROUPI )){
 
             // --- Est-ce que Arthur peut lancer une lance
             u8 all_lances_cachees = 1;
@@ -413,13 +427,16 @@ void arthur_lance_arme(arthur_t *arthur){
 
                 // --- Une lance est partie, on provoque le mouvement du lancer en 2 étapes
                 arthur->frame_mvt_lance = 0;
-                arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT1);
+                arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT1_DEBOUT);
+                if ( arthur->position == ARTHUR_ACCROUPI ){
+                    arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT1_ACCROUPI);
+                }
                 arthur->tile_offset_y=2;
                 if ( arthur->sens == 1 ){
                     arthur->tile_offset_y=0;
                 }
-                arthur->position = ARTHUR_LANCE;
                 arthur_update(arthur);
+                arthur->tir1 = 1;
             }
         }
     }
@@ -427,7 +444,7 @@ void arthur_lance_arme(arthur_t *arthur){
 
 void arthur_lance_arme_evolution(arthur_t *arthur){
 
-    if ( arthur->position == ARTHUR_LANCE ){
+    if ( arthur->tir1 == 1 ){
 
         u16 frames1 = 5;
         u16 frames2 = 10;
@@ -445,15 +462,30 @@ void arthur_lance_arme_evolution(arthur_t *arthur){
         }
 
         if ( arthur->frame_mvt_lance >= frames1 && arthur->frame_mvt_lance <= frames2 ){
-            arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT2);
+            if ( arthur->position == ARTHUR_DEBOUT ){
+                arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT2_DEBOUT);
+            }
+            else if ( arthur->position == ARTHUR_ACCROUPI ){
+                arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT2_ACCROUPI);
+            }
         }
         else if ( arthur->frame_mvt_lance > frames2 && arthur->frame_mvt_lance <= frames3 ) {
-            arthur_set_position(arthur, GNG_ARTHUR_TILES_DEBOUT);
+            if ( arthur->position == ARTHUR_DEBOUT ){
+                arthur_set_position(arthur, GNG_ARTHUR_TILES_DEBOUT);
+            }
+            else if ( arthur->position == ARTHUR_ACCROUPI ){
+                arthur_set_position(arthur, GNG_ARTHUR_TILES_ACCROUPI);
+            }
         }
         else if ( arthur->frame_mvt_lance > frames3 ) {
-            arthur_set_position(arthur, GNG_ARTHUR_TILES_DEBOUT);
-            arthur->position = ARTHUR_DEBOUT;
+            if ( arthur->position == ARTHUR_DEBOUT ){
+                arthur_set_position(arthur, GNG_ARTHUR_TILES_DEBOUT);
+            }
+            else if ( arthur->position == ARTHUR_ACCROUPI ){
+                arthur_set_position(arthur, GNG_ARTHUR_TILES_ACCROUPI);
+            }
             arthur->frame_mvt_lance = 0;
+            arthur->tir1 = 0;
         }
 
         arthur_update(arthur);
