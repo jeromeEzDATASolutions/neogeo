@@ -349,7 +349,7 @@ int main(void) {
                 }
             }
             else if ( b1 ) {
-                arthur_lance_arme(&arthur);
+                //arthur_lance_arme(&arthur);
                 lance_start(lances, arthur.x, arthur.y);
             }
             else if ( arthur.state == ARTHUR_SUR_LE_SOL ){
@@ -362,6 +362,7 @@ int main(void) {
             // --- Appui sur button A : on tire         //
             // ---------------------------------------- //
             if ( b1 ) {
+                arthur_lance_arme(&arthur);
                 lance_start(lances, arthur.x, arthur.y);
             }
 
@@ -481,7 +482,7 @@ int main(void) {
                 nuage.y = 140;
             }
 
-            //snprintf(str, 10, "POSY %3d", arthur.position_y); ng_text(2, 9, 0, str);
+            snprintf(str, 10, "POSY %3d", arthur.frame_mvt_lance); ng_text(2, 3, 0, str);
         }
 
         ng_wait_vblank();

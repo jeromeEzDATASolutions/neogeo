@@ -3,7 +3,7 @@
  * Structure & functions for the background
  */
 
-#define GNG_ARTHUR_TMX_WIDTH 36
+#define GNG_ARTHUR_TMX_WIDTH 38
 #define GNG_ARTHUR_TMX_HEIGHT 7
 
 #define FIXED_POINT 8
@@ -16,11 +16,13 @@
 #define JUMP_VELOCITY INT_TO_FIXED(-4)
 #define GRAVITY INT_TO_FIXED(1)
 
+#define GNG_ARTHUR_TILES_DEBOUT 0
 #define GNG_ARTHUR_TILES_ACCROUPI 22
 #define GNG_ARTHUR_TILES_ECHELLE 24
 #define GNG_ARTHUR_TILES_ECHELLE_END 26
 #define GNG_ARTHUR_TILES_CUL 32
-#define GNG_ARTHUR_TILES_LANCE_ARME 34
+#define GNG_ARTHUR_TILES_LANCE_ARME_MVT1 34
+#define GNG_ARTHUR_TILES_LANCE_ARME_MVT2 36
 
 static void arthur_init_tmx();
 static int arthur_walk_right();
@@ -67,6 +69,7 @@ typedef struct _arthur_t {
     u16 frame_echelle;
     u16 frame_echelle_end;
     u16 frame_lance;
+    u16 frame_mvt_lance;
     u16 absolute_bottom_left_x;
     u16 absolute_bottom_right_x;
     u16 tile_bottom_left;
@@ -102,6 +105,7 @@ arthur_t arthur = {
     .frame_echelle = 0, 
     .frame_echelle_end = 0, 
     .frame_lance = 0, 
+    .frame_mvt_lance = 0, 
     .absolute_bottom_left_x = GNG_START_ARTHUR_POSISTION_X, 
     .absolute_bottom_right_x = GNG_START_ARTHUR_POSISTION_X + (2*16), 
     .tile_bottom_left = 0, 
@@ -137,6 +141,7 @@ arthur_t arthur_origin = {
     .frame_echelle = 0, 
     .frame_echelle_end = 0, 
     .frame_lance = 0, 
+    .frame_mvt_lance = 0, 
     .absolute_bottom_left_x = GNG_START_ARTHUR_POSISTION_X, 
     .absolute_bottom_right_x = GNG_START_ARTHUR_POSISTION_X + 32, 
     .tile_bottom_left = 0,
@@ -171,6 +176,7 @@ void arthur_reset(arthur_t *arthur, arthur_t *arthur_origin){
     arthur->frame_echelle = arthur_origin->frame_echelle;
     arthur->frame_echelle_end = arthur_origin->frame_echelle_end;
     arthur->frame_lance = arthur_origin->frame_lance;
+    arthur->frame_mvt_lance = arthur_origin->frame_mvt_lance;
     arthur->absolute_bottom_left_x = arthur_origin->absolute_bottom_left_x;
     arthur->absolute_bottom_right_x = arthur_origin->absolute_bottom_right_x;
     arthur->tile_bottom_left = arthur_origin->tile_bottom_left;
@@ -367,13 +373,24 @@ void arthur_accroupi(arthur_t *arthur){
 
 void arthur_lance_arme(arthur_t *arthur){
 
-    arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME);
+    arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT1);
 
     arthur->tile_offset_y=2;
-    if ( arthur->sens == 1 )
+    if ( arthur->sens == 1 ){
         arthur->tile_offset_y=0;
+    }
 
     arthur->position = ARTHUR_LANCE;
+
+    arthur->frame_mvt_lance++;
+
+    if ( arthur->frame_mvt_lance >=5 && arthur->frame_mvt_lance <= 10 ){
+        arthur_set_position(arthur, GNG_ARTHUR_TILES_LANCE_ARME_MVT2);
+    }
+    else if ( arthur->frame_mvt_lance > 10 ) {
+        arthur_set_position(arthur, GNG_ARTHUR_TILES_DEBOUT);
+        arthur->frame_mvt_lance = 0;
+    }
 
     arthur_update(arthur);
 }
