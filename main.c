@@ -248,50 +248,51 @@ int main(void) {
 
             lances_gestion(lances);
 
-            // --------------------------------------------------
-            // --- ARTHUR BOTTOM
-            // --------------------------------------------------
+            if ( arthur.state == ARTHUR_SAUTE_VERTICALEMENT || arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ) {
+                // --------------------------------------------------
+                // --- ARTHUR EST EN TRAIN DE SAUTER
+                // --------------------------------------------------
+                arthur_jump_update(&arthur, &pont);
+                if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
+                    if ( arthur.sens == 1 ){
+                        arthur_update_posision_x_right(&arthur);
+                        scroll_right();
+                    }
+                    else {
+                        if ( arthur.position_x > 144 ){
+                            if ( arthur.tile_left != SOLDUR3 && arthur.tile_left != SOLDUR2 && arthur.tile_left != 358 ){
+                                arthur_update_posision_x_left(&arthur);
+                                scroll_left();
+                            }
+                        }
+                    }
+                }
+            }
+            else if ( arthur.state == ARTHUR_TOMBE ) {
+                arthur_tombe_update(&arthur);
+            }
+
             if (bios_p1current & CNT_LEFT ) {
-
+                // --------------------------------------------------
+                // --- ARTHUR LEFT
+                // --------------------------------------------------
                 arthur.sens = 0;
-
                 if ( arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_PLATEFORME){
-
                     arthur.frames++;
-
                     if ( b2 ){
                         // Saut vers la gauche
                         arthur_jump_horizontal(&arthur);
                     }
                     else arthur_walk_left(&arthur);
-
-                    /*if ( background.position_x > 0 ){
-
-                        if ( b2 ){
-                            // Saut vers la gauche
-                            arthur_jump_horizontal(&arthur);
-                        }
-                        else {
-                            // Moves Arthur on left
-                            if ( arthur_walk_left(&arthur) ){
-                                scroll_left();
-                            }
-                        }
-                    }
-                    else {
-                        // --- Arthur fait du surplace
-                        arthur_walk_left(&arthur);
-                    }*/
                 }
             }
             else if (bios_p1current & CNT_RIGHT && background.position_x < 3260 ) {
-
+                // --------------------------------------------------
+                // --- ARTHUR RIGHT
+                // --------------------------------------------------
                 arthur.sens = 1;
-
                 if ( (arthur.state == ARTHUR_SUR_LE_SOL || arthur.state == ARTHUR_SUR_PLATEFORME) && arthur.tir1 == 0 && arthur.tir2 == 0 && arthur.tir3 == 0 ){
-
                     arthur.frames++;
-
                     if ( b2 ){
                         // Saut vers la droite
                         arthur_jump_horizontal(&arthur);
@@ -385,30 +386,6 @@ int main(void) {
             // if arthur mort, on fait disparaitre le niveau dans un fondu avec la palette
             // fadeInPalette(palettes1, 2);
 
-            if ( arthur.state == ARTHUR_SAUTE_VERTICALEMENT || arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ) {
-                arthur_jump_update(&arthur, &pont);
-                if ( arthur.state == ARTHUR_SAUTE_HORIZONTALEMENT ){
-                    if ( arthur.sens == 1 ){
-                        //if ( arthur.tile_right != SOLDUR3 && arthur.tile_right != SOLDUR2 && arthur.tile_right != 358 ){
-                            arthur_update_posision_x_right(&arthur);
-                            scroll_right();
-                        //}
-                    }
-                    else {
-                        if ( arthur.position_x > 144 ){
-                            if ( arthur.tile_left != SOLDUR3 && arthur.tile_left != SOLDUR2 && arthur.tile_left != 358 ){
-                                arthur_update_posision_x_left(&arthur);
-                                scroll_left();
-                            }
-                        }
-                    }
-                }
-                // arthur_walk_right(&arthur);
-            }
-            else if ( arthur.state == ARTHUR_TOMBE ) {
-                arthur_tombe_update(&arthur);
-            }
-
             // ------------------------------------------
             // Premier PONT
             // ------------------------------------------
@@ -491,9 +468,11 @@ int main(void) {
                 nuage.y = 140;
             }
 
-            //snprintf(str, 10, "P1 %3d", lances[0].x); ng_text(2, 3, 0, str);
+            //snprintf(str, 10, "P1 %3d", arthur.state); ng_text(2, 3, 0, str);
             //snprintf(str, 10, "LAN %3d", arthur.frame_mvt_lance); ng_text(2, 3, 0, str);
             //snprintf(str, 10, "POSA %3d", arthur.position); ng_text(2, 5, 0, str);
+            snprintf(str, 10, "%4d", arthur.absolute_bottom_left_x); ng_text(2, 3, 0, str);
+
         }
 
         ng_wait_vblank();

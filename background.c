@@ -30,7 +30,7 @@ plane_t background = {
     .height = 15,
     .x = 0,
     .y = 0,
-    .increment = FIX_POINT(0,1),  // 1.0
+    .increment = 1,  // FIX_POINT(0,1)
     .tmx = {},
     .position_x = 0,
     .position_x_cpt1 = 0,
@@ -267,41 +267,47 @@ void update_plane_right(plane_t *plane) {
 
 void set_sprite_and_tile(plane_t *plane){
     u16 tmp_position_x = plane->position_x>>4;
-    plane->position_sprite = tmp_position_x+31-(((tmp_position_x+30)>>5)*32)-1;
+    //plane->position_sprite = tmp_position_x+31-(((tmp_position_x+30)>>5)*32)-1;
+    //plane->position_sprite = tmp_position_x+31-(((tmp_position_x+30)>>5)<<5)-1;
+    plane->position_sprite = tmp_position_x+31-(((tmp_position_x+30)>>5)<<5)-1;
     plane->position_tile_right = (plane->position_x>>4)+31;
     plane->position_tile_left = (plane->position_x>>4)-1;
 }
 
 void move_plane_right(plane_t *plane){
-    plane->x-=plane->increment;
-    plane->position_x+=plane->increment;
-    plane->position_x_cpt1++;
+    //plane->x-=plane->increment;
+    //plane->position_x+=plane->increment;
+    plane->x--;
+    plane->position_x++;
+    /*plane->position_x_cpt1++;
     if ( plane->position_x_cpt1 == 16 ){
         plane->position_x_cpt1 = 0;
         set_sprite_and_tile(plane);
-    }
+    }*/
+    set_sprite_and_tile(plane);
+    update_plane_right(plane);
 }
 
 void move_plane_left(plane_t *plane){
-    plane->x+=plane->increment;
-    plane->position_x-=plane->increment;
-    plane->position_x_cpt2++;
+    //plane->x+=plane->increment;
+    plane->x++;
+    //plane->position_x-=plane->increment;
+    plane->position_x--;
+    /*plane->position_x_cpt2++;
     if ( plane->position_x_cpt2 == 16 ){
         plane->position_x_cpt2 = 0;
         set_sprite_and_tile(plane);
-    }
+    }*/
+    set_sprite_and_tile(plane);
+    update_plane_left(plane);
 }
 
 void move_planes_right(){
     move_plane_right(&background);
     move_plane_right(&herbe);
-    update_plane_right(&background);
-    update_plane_right(&herbe);
 }
 
 void move_planes_left(){
     move_plane_left(&background);
     move_plane_left(&herbe);
-    update_plane_left(&background);
-    update_plane_left(&herbe);
 }

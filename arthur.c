@@ -273,8 +273,9 @@ int arthur_walk_left(arthur_t *arthur){
         arthur_update(arthur);
     }
 
-    // --- On checke si Arthur peut aller à droite
+    // --- On checke si Arthur peut aller à gauche
     u8 tmp_choix_arthur = arthur_can_go_to_left(arthur);
+    snprintf(str, 10, "CHO %3d", tmp_choix_arthur); ng_text(2, 5, 0, str);
     if ( tmp_choix_arthur == 1 ){
         // Arthur peut marcher à gauche
         arthur->position=ARTHUR_DEBOUT;
@@ -285,6 +286,14 @@ int arthur_walk_left(arthur_t *arthur){
     else if ( tmp_choix_arthur == 2 ){
         arthur_tombe(arthur);
         return 0;
+    }
+    else if ( tmp_choix_arthur == 3 ){
+        // Arthur peut marcher à gauche mais pas de scrolling
+        arthur->position=ARTHUR_DEBOUT;
+        arthur_update_posision_x_left(arthur);
+        arthur->x--;
+        arthur_update(arthur);
+        return 1;
     }
     
     return 0;
@@ -322,6 +331,14 @@ int arthur_walk_right(arthur_t *arthur){
     else if ( tmp_choix_arthur == 2 ){
         arthur_tombe(arthur);
         return 0;
+    }
+    else if ( tmp_choix_arthur == 3 ){
+        // Arthur peut marcher à droite mais pas de scrolling
+        arthur->position=ARTHUR_DEBOUT;
+        arthur_update_posision_x_right(arthur);
+        arthur->x++;
+        arthur_update(arthur);
+        return 1;
     }
 
     /*
@@ -388,7 +405,7 @@ void arthur_accroupi(arthur_t *arthur){
 
 void arthur_lance_arme(arthur_t *arthur){
 
-    if ( arthur->state == ARTHUR_SUR_LE_SOL ) {
+    if ( arthur->state == ARTHUR_SUR_LE_SOL || arthur->state == ARTHUR_SUR_PLATEFORME ) {
 
         if ( (arthur->tir1 == 0 && arthur->tir2 == 0 && arthur->tir3 == 0) && ( arthur->position == ARTHUR_DEBOUT || arthur->position == ARTHUR_ACCROUPI )){
 
@@ -495,6 +512,8 @@ void arthur_lance_arme_evolution(arthur_t *arthur){
 int arthur_descend_echelle(arthur_t *arthur){
 
     char str[10];
+    snprintf(str, 10, "%3d", arthur->state); ng_text(2, 10, 0, str);
+
     u16 arthur_tile1 = 0;
     u16 arthur_tile2 = 0;
 
@@ -511,7 +530,11 @@ int arthur_descend_echelle(arthur_t *arthur){
         snprintf(str, 10, "STAT %4d", arthur->state); ng_text(2, 7, 0, str);
     }
 
-    if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+    if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
+        // --- Arthur se baisse
+        arthur_accroupi(arthur);
+    }
+    else if ( arthur->state == ARTHUR_SUR_LE_SOL ){
 
         // --- On checke si la tile sous Arthur est une fin d'echelle
         if ( arthur_tile1 == TILE_ECHELLE_END && arthur_tile2 == TILE_ECHELLE_END ){
@@ -540,9 +563,7 @@ int arthur_descend_echelle(arthur_t *arthur){
         }
     }
     else {
-        if ( DEBUG ){
-            snprintf(str, 10, "%3d", arthur->state); ng_text(2, 17, 0, str);
-        }
+        snprintf(str, 10, "%3d", arthur->state); ng_text(2, 5, 0, str);
     }
     
     if ( arthur->state == ARTHUR_SUR_ECHELLE ){
@@ -732,37 +753,45 @@ void arthur_jump_update(arthur_t *arthur, pont_t *pont){
 int arthur_can_go_to_left(arthur_t *arthur){
 
     char str[10];
-    arthur_calcule_tiles(arthur);
-    
-    if ( arthur->sens == 0 && arthur->absolute_bottom_left_x > 144 ){
 
-        if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
-            if ( arthur->x+16 > pont.x && arthur->x+16 < pont.x+32 ){
-                return 1;
-            }
-            else {
-                return 2;
-            }
+    arthur_calcule_tiles(arthur);
+
+    if ( arthur->sens == 0 ) {
+
+        if ( arthur->absolute_bottom_left_x > 0 &&  arthur->absolute_bottom_left_x <= 144 ){
+            // Arthur peut marcher à gauche mais pas de scrolling
+            return 3;
         }
-        else if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-            // On checke déjà si un mur existe à gauche
-            if ( arthur->tile_left == MURDURLEFT || arthur->tile_left == MURDURLEFTRIGHT ){
-                return 0; // ON BLOQUE ARTHUR
-            }
-            else {
-                u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-12)>>4)];
-                //snprintf(str, 10, "T %4d", arthur_tile); ng_text(2, 5, 0, str);
-                if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
+        else if ( arthur->absolute_bottom_left_x > 144 ){
+
+            if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
+                if ( arthur->x+16 > pont.x && arthur->x+16 < pont.x+32 ){
                     return 1;
                 }
                 else {
-                    u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-22)>>4)];
+                    return 2;
+                }
+            }
+            else if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+                // On checke déjà si un mur existe à gauche
+                if ( arthur->tile_left == MURDURLEFT || arthur->tile_left == MURDURLEFTRIGHT ){
+                    return 0; // ON BLOQUE ARTHUR
+                }
+                else {
+                    u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-12)>>4)];
+                    //snprintf(str, 10, "T %4d", arthur_tile); ng_text(2, 5, 0, str);
                     if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
                         return 1;
                     }
-                    else if ( arthur->tile_bottom_left == 0 || arthur->tile_bottom_left == TILE_ECHELLE ){
-                        // Si aucune tile ou une tile d'echelle (pas la fin de l'echelle) alors on tombe
-                        return 2;
+                    else {
+                        u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_right_x-22)>>4)];
+                        if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
+                            return 1;
+                        }
+                        else if ( arthur->tile_bottom_left == 0 || arthur->tile_bottom_left == TILE_ECHELLE ){
+                            // Si aucune tile ou une tile d'echelle (pas la fin de l'echelle) alors on tombe
+                            return 2;
+                        }
                     }
                 }
             }
@@ -779,33 +808,39 @@ int arthur_can_go_to_right(arthur_t *arthur){
 
     if ( arthur->sens == 1 ){
 
-        if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
-            if ( arthur->x+16 > pont.x && arthur->x+16 < pont.x+32 ){
-                return 1;
-            }
-            else {
-                //snprintf(str, 10, "%4d %4d", arthur->x, pont.x); ng_text(2, 7, 0, str);
-                return 2;
-            }
+        if ( arthur->absolute_bottom_left_x >= 0 &&  arthur->absolute_bottom_left_x <= 144 ){
+            // Arthur peut marcher à gauche mais pas de scrolling
+            return 3;
         }
-        else if ( arthur->state == ARTHUR_SUR_LE_SOL ){
-            // On checke déjà si un mur existe à droite
-            if ( arthur->tile_right == MURDURLEFT || arthur->tile_right == MURDURLEFTRIGHT ){
-                return 0;
-            }
-            else {
-                u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+12)>>4)];
-                //snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 5, 0, str);
-                if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
+        else {
+            if ( arthur->state == ARTHUR_SUR_PLATEFORME ){
+                if ( arthur->x+16 > pont.x && arthur->x+16 < pont.x+32 ){
                     return 1;
                 }
                 else {
-                    u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+22)>>4)];
+                    //snprintf(str, 10, "%4d %4d", arthur->x, pont.x); ng_text(2, 7, 0, str);
+                    return 2;
+                }
+            }
+            else if ( arthur->state == ARTHUR_SUR_LE_SOL ){
+                // On checke déjà si un mur existe à droite
+                if ( arthur->tile_right == MURDURLEFT || arthur->tile_right == MURDURLEFTRIGHT ){
+                    return 0;
+                }
+                else {
+                    u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+12)>>4)];
+                    //snprintf(str, 10, "TILE %4d", arthur_tile); ng_text(2, 5, 0, str);
                     if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
                         return 1;
                     }
-                    else if ( arthur->tile_bottom_right == 0 || arthur->tile_bottom_right == TILE_ECHELLE ){
-                        return 2;
+                    else {
+                        u16 arthur_tile = tmx_sol[arthur->tiley+1][((arthur->absolute_bottom_left_x+22)>>4)];
+                        if ( arthur_tile == SOLDUR1 || arthur_tile == SOLDUR2 || arthur_tile == SOLDUR3 || arthur_tile == SOLDUR4 || arthur_tile == TILE_ECHELLE_END ) {
+                            return 1;
+                        }
+                        else if ( arthur->tile_bottom_right == 0 || arthur->tile_bottom_right == TILE_ECHELLE ){
+                            return 2;
+                        }
                     }
                 }
             }
